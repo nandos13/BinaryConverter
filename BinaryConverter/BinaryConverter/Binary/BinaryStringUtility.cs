@@ -5,18 +5,29 @@
     /// When creating strings for a binary value of more than one byte, an optional delimiter character
     /// can be specified to break up each byte in the resulting string.
     /// <para>
-    /// Note: Byte arguments are arranged in low-to-high order.
+    /// Note: Byte arguments are arranged in high-to-low order.
     /// </para>
     /// </summary>
     public static class BinaryStringUtility
     {
-        public const char kDefaultDelimeter = ' ';
+        /// <summary>
+        /// When specified as the delimeter character, no delimeter will be used between bytes.
+        /// </summary>
+        public const char kNoDelimeter = '\0';
 
         private const char kCharZero = '0';
         private const char kCharOne = '1';
 
-        private static unsafe string ToString(byte* bytes, int count, bool addDelimeter, char delimeter)
+        /// <summary>
+        /// Creates a string representing the given binary value.
+        /// </summary>
+        /// <param name="bytes">A pointer to the first byte of the binary value.</param>
+        /// <param name="count">The number of bytes to process.</param>
+        /// <param name="delimeter">A delimiting character to print between each byte if overridden.</param>
+        private static unsafe string ToString(byte* bytes, int count, char delimeter = kNoDelimeter)
         {
+            bool addDelimeter = delimeter != kNoDelimeter;
+
             int totalCharCount = count * 8 + (addDelimeter ? count - 1 : 0);
 
             var array = new char[totalCharCount];
@@ -53,53 +64,32 @@
         /// <param name="b5">The 6th byte in the binary value.</param>
         /// <param name="b6">The 7th byte in the binary value.</param>
         /// <param name="b7">The 8th byte in the binary value.</param>
-        /// <param name="delimeter">A delimiting character to print between each byte.</param>
-        public static unsafe string ToString(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, char delimeter)
+        /// <param name="delimeter">A delimiting character to print between each byte if overridden.</param>
+        public static unsafe string ToString(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, char delimeter = kNoDelimeter)
         {
-            var bytes = stackalloc byte[] { b7, b6, b5, b4, b3, b2, b1, b0 };
-            return ToString(bytes, 8, true, delimeter);
+            var bytes = stackalloc byte[] { b0, b1, b2, b3, b4, b5, b6, b7 };
+            return ToString(bytes, 8, delimeter);
         }
 
         /// <inheritdoc cref="BinaryStringUtility.ToString(byte, byte, byte, byte, byte, byte, byte, byte, char)"/>
-        public static unsafe string ToString(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+        public static unsafe string ToString(byte b0, byte b1, byte b2, byte b3, char delimeter = kNoDelimeter)
         {
-            var bytes = stackalloc byte[] { b7, b6, b5, b4, b3, b2, b1, b0 };
-            return ToString(bytes, 8, false, default);
+            var bytes = stackalloc byte[] { b0, b1, b2, b3 };
+            return ToString(bytes, 4, delimeter);
         }
 
         /// <inheritdoc cref="BinaryStringUtility.ToString(byte, byte, byte, byte, byte, byte, byte, byte, char)"/>
-        public static unsafe string ToString(byte b0, byte b1, byte b2, byte b3, char delimeter)
+        public static unsafe string ToString(byte b0, byte b1, char delimeter = kNoDelimeter)
         {
-            var bytes = stackalloc byte[] { b3, b2, b1, b0 };
-            return ToString(bytes, 4, true, delimeter);
-        }
-
-        /// <inheritdoc cref="BinaryStringUtility.ToString(byte, byte, byte, byte, byte, byte, byte, byte, char)"/>
-        public static unsafe string ToString(byte b0, byte b1, byte b2, byte b3)
-        {
-            var bytes = stackalloc byte[] { b3, b2, b1, b0 };
-            return ToString(bytes, 4, false, default);
-        }
-
-        /// <inheritdoc cref="BinaryStringUtility.ToString(byte, byte, byte, byte, byte, byte, byte, byte, char)"/>
-        public static unsafe string ToString(byte b0, byte b1, char delimeter)
-        {
-            var bytes = stackalloc byte[] { b1, b0 };
-            return ToString(bytes, 2, true, delimeter);
-        }
-
-        /// <inheritdoc cref="BinaryStringUtility.ToString(byte, byte, byte, byte, byte, byte, byte, byte, char)"/>
-        public static unsafe string ToString(byte b0, byte b1)
-        {
-            var bytes = stackalloc byte[] { b1, b0 };
-            return ToString(bytes, 2, false, default);
+            var bytes = stackalloc byte[] { b0, b1 };
+            return ToString(bytes, 2, delimeter);
         }
 
         /// <inheritdoc cref="BinaryStringUtility.ToString(byte, byte, byte, byte, byte, byte, byte, byte, char)"/>
         public static unsafe string ToString(byte b)
         {
             var bytes = stackalloc byte[] { b };
-            return ToString(bytes, 1, false, default);
+            return ToString(bytes, 1, kNoDelimeter);
         }
     }
 }

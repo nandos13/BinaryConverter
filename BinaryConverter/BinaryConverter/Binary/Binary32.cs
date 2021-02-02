@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace JPAssets.Binary
 {
+    /// <summary>
+    /// A 32-bit binary data structure.
+    /// </summary>
     [StructLayout(LayoutKind.Explicit)]
     [System.Diagnostics.DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public readonly struct Binary32 : IEquatable<Binary32>

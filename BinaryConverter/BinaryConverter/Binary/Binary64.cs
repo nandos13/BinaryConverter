@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace JPAssets.Binary
 {
+    /// <summary>
+    /// A 64-bit binary data structure.
+    /// </summary>
     [StructLayout(LayoutKind.Explicit)]
     [System.Diagnostics.DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public readonly struct Binary64 : IEquatable<Binary64>
