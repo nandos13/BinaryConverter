@@ -1,7 +1,6 @@
 ﻿namespace JPAssets.Binary
 {
-    // TODO: Implement unit tests.
-    // TODO: Method documentation.
+    // TODO: Add method documentation.
     /// <summary>
     /// A collection of methods that can be used to convert most base data types to their byte values,
     /// as well as convert arbitrary bytes into base data types.
