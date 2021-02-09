@@ -50,16 +50,7 @@ namespace JPAssets.Binary
 
         public override int GetHashCode()
         {
-            int hashCode = -1565308108;
-            hashCode = hashCode * -1521134295 + b0.GetHashCode();
-            hashCode = hashCode * -1521134295 + b1.GetHashCode();
-            hashCode = hashCode * -1521134295 + b2.GetHashCode();
-            hashCode = hashCode * -1521134295 + b3.GetHashCode();
-            hashCode = hashCode * -1521134295 + b4.GetHashCode();
-            hashCode = hashCode * -1521134295 + b5.GetHashCode();
-            hashCode = hashCode * -1521134295 + b6.GetHashCode();
-            hashCode = hashCode * -1521134295 + b7.GetHashCode();
-            return hashCode;
+            return HashCode.Combine(b0, b1, b2, b3, b4, b5, b6, b7);
         }
 
         public static bool operator ==(Binary64 left, Binary64 right)

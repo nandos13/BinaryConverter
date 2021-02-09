@@ -6,10 +6,9 @@ namespace JPAssets.Binary
     /// Utility class for creating strings that represent a binary value.
     /// When creating strings for a binary value of more than one byte, an optional delimiter character
     /// can be specified to break up each byte in the resulting string.
-    /// <para>
-    /// Note: Byte arguments are arranged in high-to-low order.
-    /// </para>
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0501:Explicit new array type allocation")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0502:Explicit new reference type allocation")]
     public static class BinaryStringUtility
     {
         /// <summary>
