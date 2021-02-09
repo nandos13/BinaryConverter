@@ -19,6 +19,20 @@ namespace JPAssets.Binary
             this.b1 = b1;
         }
 
+        public unsafe Binary16(byte* ptr)
+        {
+            this.b0 = *(ptr + 0);
+            this.b1 = *(ptr + 1);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Binary16"/> instance with reversed-endianness.
+        /// </summary>
+        public Binary16 Reverse()
+        {
+            return new Binary16(b1, b0);
+        }
+
         public bool Equals(Binary16 other)
         {
             return b0.Equals(other.b0)

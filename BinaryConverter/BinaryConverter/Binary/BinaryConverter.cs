@@ -5,7 +5,7 @@
     /// A collection of methods that can be used to convert most base data types to their byte values,
     /// as well as convert arbitrary bytes into base data types.
     /// <para>
-    /// Note: Byte arguments are arranged in high-to-low order.
+    /// Note: Byte arguments are always arranged in little-endian order.
     /// </para>
     /// </summary>
     public static class BinaryConverter

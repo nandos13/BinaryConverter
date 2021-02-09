@@ -19,16 +19,6 @@ namespace JPAssets.Binary
         private const char kCharZero = '0';
         private const char kCharOne = '1';
 
-        private static void CheckCount(int count, int upperBound = int.MaxValue)
-        {
-            if (count < 0 || count > upperBound) throw new ArgumentOutOfRangeException(nameof(count));
-        }
-
-        private static void CheckOffset(int offset, int upperBound)
-        {
-            if (offset < 0 || offset > upperBound) throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
         /// <summary>
         /// Creates an array of <see cref="System.Char"/> representing the given binary value.
         /// </summary>
@@ -67,7 +57,7 @@ namespace JPAssets.Binary
         /// <inheritdoc cref="ToCharsInternal(byte*, int, char)"/>
         public static unsafe char[] ToChars(byte* ptr, int count, char delimeter = kNoDelimeter)
         {
-            CheckCount(count);
+            ValidationUtility.CheckCount(count);
             return ToCharsInternal(ptr, count, delimeter);
         }
 
@@ -77,7 +67,7 @@ namespace JPAssets.Binary
         /// <inheritdoc cref="ToCharsInternal(byte*, int, char)"/>
         public static unsafe string ToString(byte* ptr, int count, char delimeter = kNoDelimeter)
         {
-            CheckCount(count);
+            ValidationUtility.CheckCount(count);
             return new string(ToCharsInternal(ptr, count, delimeter));
         }
 
@@ -86,11 +76,7 @@ namespace JPAssets.Binary
         /// <inheritdoc cref="BinaryStringUtility.ToCharsInternal(byte*, int, char)"/>
         public static unsafe char[] ToChars(byte[] bytes, int offset, int count, char delimeter = kNoDelimeter)
         {
-            _ = bytes ?? throw new ArgumentNullException(nameof(bytes));
-
-            int length = bytes.Length;
-            CheckOffset(offset, length - 1);
-            CheckCount(count, length - offset);
+            ValidationUtility.CheckArrayOffsetAndCount(bytes, nameof(bytes), offset, count);
 
             if (count == 0)
                 return Array.Empty<char>();

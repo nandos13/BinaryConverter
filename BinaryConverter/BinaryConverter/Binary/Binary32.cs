@@ -23,12 +23,28 @@ namespace JPAssets.Binary
             this.b3 = b3;
         }
 
+        public unsafe Binary32(byte* ptr)
+        {
+            this.b0 = *(ptr + 0);
+            this.b1 = *(ptr + 1);
+            this.b2 = *(ptr + 2);
+            this.b3 = *(ptr + 3);
+        }
+
         public bool Equals(Binary32 other)
         {
             return b0.Equals(other.b0)
                 && b1.Equals(other.b1)
                 && b2.Equals(other.b2)
                 && b3.Equals(other.b3);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Binary32"/> instance with reversed-endianness.
+        /// </summary>
+        public Binary32 Reverse()
+        {
+            return new Binary32(b3, b2, b1, b0);
         }
 
         public override bool Equals(object obj)

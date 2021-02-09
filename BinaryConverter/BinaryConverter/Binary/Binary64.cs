@@ -31,6 +31,26 @@ namespace JPAssets.Binary
             this.b7 = b7;
         }
 
+        public unsafe Binary64(byte* ptr)
+        {
+            this.b0 = *(ptr + 0);
+            this.b1 = *(ptr + 1);
+            this.b2 = *(ptr + 2);
+            this.b3 = *(ptr + 3);
+            this.b4 = *(ptr + 4);
+            this.b5 = *(ptr + 5);
+            this.b6 = *(ptr + 6);
+            this.b7 = *(ptr + 7);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Binary64"/> instance with reversed-endianness.
+        /// </summary>
+        public Binary64 Reverse()
+        {
+            return new Binary64(b7, b6, b5, b4, b3, b2, b1, b0);
+        }
+
         public bool Equals(Binary64 other)
         {
             return b0.Equals(other.b0)
