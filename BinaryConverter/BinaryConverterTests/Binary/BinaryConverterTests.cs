@@ -19,106 +19,190 @@ namespace JPAssets.Binary.Tests
 
         private static (byte b, bool value)[] GetBooleanPairs()
         {
-            return new (byte, bool)[]
+            return new (byte b, bool value)[]
             {
-                (0,   false),
-                (1,   true),
-                (127, true),
-                (128, true),
-                (255, true)
+                (b:    0, value: false),
+                (b: 0x01, value: true),
+                (b: 0x7F, value: true),
+                (b: 0x80, value: true),
+                (b: 0xFF, value: true)
             };
         }
 
         private static (byte b, sbyte value)[] GetSBytePairs()
         {
-            return new (byte, sbyte)[]
+            return new (byte b, sbyte value)[]
             {
-                (0,   0),
-                (1,   1),
-                (127, 127),
-                (128, -128),
-                (255, -1)
+                (b:    0, value: 0),
+                (b: 0x01, value: 1),
+                (b: 0x7F, value: 127),
+                (b: 0x80, value: -128),
+                (b: 0xFF, value: -1)
             };
         }
 
         private static (byte[] bytes, char value)[] GetCharPairs()
         {
-            return new (byte[], char)[]
+            return new (byte[] bytes, char value)[]
             {
-                (new byte[2] { 0, 0 },     (char)0),
-                (new byte[2] { 0, 1 },     (char)1),
-                (new byte[2] { 0, 128 },   (char)128),
-                (new byte[2] { 0, 255 },   (char)255),
-                (new byte[2] { 1, 0 },     (char)256),
-                (new byte[2] { 4, 0 },     (char)1024),
-                (new byte[2] { 255, 255 }, (char)65535)
+                (bytes: new byte[2] {    0,    0 }, value: (char)0),
+                (bytes: new byte[2] {    0, 0x01 }, value: (char)1),
+                (bytes: new byte[2] {    0, 0x80 }, value: (char)128),
+                (bytes: new byte[2] {    0, 0xFF }, value: (char)255),
+                (bytes: new byte[2] { 0x01,    0 }, value: (char)256),
+                (bytes: new byte[2] { 0x04,    0 }, value: (char)1024),
+                (bytes: new byte[2] { 0xFF, 0xFF }, value: (char)65535)
             };
         }
 
         private static (byte[] bytes, short value)[] GetInt16Pairs()
         {
-            return new (byte[], short)[]
+            return new (byte[] bytes, short value)[]
             {
-                (new byte[2] { 0, 0 },     0),
-                (new byte[2] { 0, 1 },     1),
-                (new byte[2] { 0, 128 },   128),
-                (new byte[2] { 0, 255 },   255),
-                (new byte[2] { 1, 0 },     256),
-                (new byte[2] { 4, 0 },     1024),
-                (new byte[2] { 127, 255 },   32767),
-                (new byte[2] { 128, 0 },   -32768),
-                (new byte[2] { 255, 255 }, -1)
+                (bytes: new byte[2] {    0,    0 }, value: 0),
+                (bytes: new byte[2] {    0, 0x01 }, value: +1),
+                (bytes: new byte[2] {    0, 0x80 }, value: +128),
+                (bytes: new byte[2] {    0, 0xFF }, value: +255),
+                (bytes: new byte[2] { 0x01,    0 }, value: +256),
+                (bytes: new byte[2] { 0x04,    0 }, value: +1024),
+                (bytes: new byte[2] { 0x7F, 0xFF }, value: +32767),
+                (bytes: new byte[2] { 0x80,    0 }, value: -32768),
+                (bytes: new byte[2] { 0xFF, 0xFF }, value: -1)
             };
         }
 
         private static (byte[] bytes, ushort value)[] GetUInt16Pairs()
         {
-            return new (byte[], ushort)[]
+            return new (byte[] bytes, ushort value)[]
             {
-                (new byte[2] { 0, 0 },     0),
-                (new byte[2] { 0, 1 },     1),
-                (new byte[2] { 0, 128 },   128),
-                (new byte[2] { 0, 255 },   255),
-                (new byte[2] { 1, 0 },     256),
-                (new byte[2] { 4, 0 },     1024),
-                (new byte[2] { 255, 255 }, 65535)
+                (bytes: new byte[2] {    0,    0 }, value: 0),
+                (bytes: new byte[2] {    0, 0x01 }, value: 1),
+                (bytes: new byte[2] {    0, 0x80 }, value: 128),
+                (bytes: new byte[2] {    0, 0xFF }, value: 255),
+                (bytes: new byte[2] { 0x01,    0 }, value: 256),
+                (bytes: new byte[2] { 0x04,    0 }, value: 1024),
+                (bytes: new byte[2] { 0xFF, 0xFF }, value: 65535)
             };
         }
 
         private static (byte[] bytes, int value)[] GetInt32Pairs()
         {
-            return new (byte[], int)[]
+            return new (byte[] bytes, int value)[]
             {
-                (new byte[4] { 0, 0, 0, 0 },         0),
-                (new byte[4] { 0, 0, 0, 1 },         1),
-                (new byte[4] { 0, 0, 0, 128 },       128),
-                (new byte[4] { 0, 0, 0, 255 },       255),
-                (new byte[4] { 0, 0, 1, 0 },         256),
-                (new byte[4] { 0, 0, 4, 0 },         1024),
-                (new byte[4] { 0, 0, 127, 255 },     32767),
-                (new byte[4] { 0, 128, 0, 0 },       8388608),
-                (new byte[4] { 127, 255, 255, 255 }, 2147483647),
-                (new byte[4] { 128, 0, 0, 0 },       -2147483648),
-                (new byte[4] { 255, 255, 128, 0 },   -32768),
-                (new byte[4] { 255, 255, 255, 255 }, -1)
+                (bytes: new byte[4] {    0,    0,    0,    0 }, value: 0),
+                (bytes: new byte[4] {    0,    0,    0, 0x01 }, value: +1),
+                (bytes: new byte[4] {    0,    0,    0, 0x80 }, value: +128),
+                (bytes: new byte[4] {    0,    0,    0, 0xFF }, value: +255),
+                (bytes: new byte[4] {    0,    0, 0x01,    0 }, value: +256),
+                (bytes: new byte[4] {    0,    0, 0x04,    0 }, value: +1024),
+                (bytes: new byte[4] {    0,    0, 0x7F, 0xFF }, value: +32767),
+                (bytes: new byte[4] {    0, 0x80,    0,    0 }, value: +8388608),
+                (bytes: new byte[4] { 0x7F, 0xFF, 0xFF, 0xFF }, value: +2147483647),
+                (bytes: new byte[4] { 0x80,    0,    0,    0 }, value: -2147483648),
+                (bytes: new byte[4] { 0xFF, 0xFF, 0x80,    0 }, value: -32768),
+                (bytes: new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, value: -1)
             };
         }
 
         private static (byte[] bytes, uint value)[] GetUInt32Pairs()
         {
-            return new (byte[], uint)[]
+            return new (byte[] bytes, uint value)[]
             {
-                (new byte[4] { 0, 0, 0, 0 },         0),
-                (new byte[4] { 0, 0, 0, 1 },         1),
-                (new byte[4] { 0, 0, 0, 128 },       128),
-                (new byte[4] { 0, 0, 0, 255 },       255),
-                (new byte[4] { 0, 0, 1, 0 },         256),
-                (new byte[4] { 0, 0, 4, 0 },         1024),
-                (new byte[4] { 0, 0, 127, 255 },     32767),
-                (new byte[4] { 0, 128, 0, 0 },       8388608),
-                (new byte[4] { 127, 255, 255, 255 }, 2147483647),
-                (new byte[4] { 128, 0, 0, 0},        2147483648),
-                (new byte[4] { 255, 255, 255, 255 }, 4294967295)
+                (bytes: new byte[4] {    0,    0,    0,    0 }, value: 0),
+                (bytes: new byte[4] {    0,    0,    0, 0x01 }, value: 1),
+                (bytes: new byte[4] {    0,    0,    0, 0x80 }, value: 128),
+                (bytes: new byte[4] {    0,    0,    0, 0xFF }, value: 255),
+                (bytes: new byte[4] {    0,    0, 0x01,    0 }, value: 256),
+                (bytes: new byte[4] {    0,    0, 0x04,    0 }, value: 1024),
+                (bytes: new byte[4] {    0,    0, 0x7F, 0xFF }, value: 32767),
+                (bytes: new byte[4] {    0, 0x80,    0,    0 }, value: 8388608),
+                (bytes: new byte[4] { 0x7F, 0xFF, 0xFF, 0xFF }, value: 2147483647),
+                (bytes: new byte[4] { 0x80,    0,    0,    0 }, value: 2147483648),
+                (bytes: new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, value: 4294967295)
+            };
+        }
+
+        private static (byte[] bytes, long value)[] GetInt64Pairs()
+        {
+            return new (byte[] bytes, long value)[]
+            {
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, value: 0),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x01 }, value: +1),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x80 }, value: +128),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0xFF }, value: +255),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x01,    0 }, value: +256),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x04,    0 }, value: +1024),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x7F, 0xFF }, value: +32767),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0, 0x80,    0,    0 }, value: +8388608),
+                (bytes: new byte[8] {    0,    0,    0,    0, 0x7F, 0xFF, 0xFF, 0xFF }, value: +2147483647),
+                (bytes: new byte[8] { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: +9223372036854775807),
+                (bytes: new byte[8] { 0x80,    0,    0,    0,    0,    0,    0,    0 }, value: -9223372036854775808),
+                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    0 }, value: -256),
+                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: -1)
+            };
+        }
+
+        private static (byte[] bytes, ulong value)[] GetUInt64Pairs()
+        {
+            return new (byte[] bytes, ulong value)[]
+            {
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, value: 0),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x01 }, value: 1),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x80 }, value: 128),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0xFF }, value: 255),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x01,    0 }, value: 256),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x04,    0 }, value: 1024),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x7F, 0xFF }, value: 32767),
+                (bytes: new byte[8] {    0,    0,    0,    0,    0, 0x80,    0,    0 }, value: 8388608),
+                (bytes: new byte[8] {    0,    0,    0,    0, 0x7F, 0xFF, 0xFF, 0xFF }, value: 2147483647),
+                (bytes: new byte[8] {    0,    0,    0,    0, 0x80,    0,    0,    0 }, value: 2147483648),
+                (bytes: new byte[8] {    0,    0,    0,    0, 0xFF, 0xFF, 0xFF, 0xFF }, value: 4294967295),
+                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    0 }, value: 18446744073709551360),
+                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: 18446744073709551615)
+            };
+        }
+
+        private static (byte[] bytes, float value)[] GetSinglePairs()
+        {
+            return new (byte[] bytes, float value)[]
+            {
+                (bytes: new byte[4] {    0,    0,    0,    0 }, value: 0f),
+                (bytes: new byte[4] { 0x3D, 0xCC, 0xCC, 0xCD }, value: +0.1f),
+                (bytes: new byte[4] { 0xBD, 0xCC, 0xCC, 0xCD }, value: -0.1f),
+                (bytes: new byte[4] { 0x3C, 0x23, 0xD7, 0x0A }, value: +0.01f),
+                (bytes: new byte[4] { 0xBC, 0x23, 0xD7, 0x0A }, value: -0.01f),
+                (bytes: new byte[4] { 0x38, 0xD1, 0xB7, 0x17 }, value: +0.0001f),
+                (bytes: new byte[4] { 0xB8, 0xD1, 0xB7, 0x17 }, value: -0.0001f),
+                (bytes: new byte[4] { 0x3F, 0x80,    0,    0 }, value: +1f),
+                (bytes: new byte[4] { 0xBF, 0x80,    0,    0 }, value: -1f),
+                (bytes: new byte[4] { 0x42, 0xC8,    0,    0 }, value: +100f),
+                (bytes: new byte[4] { 0xC2, 0xC8,    0,    0 }, value: -100f),
+                (bytes: new byte[4] { 0x3F, 0x9E, 0x06, 0x10 }, value: +1.23456f),
+                (bytes: new byte[4] { 0xBF, 0x9E, 0x06, 0x10 }, value: -1.23456f),
+                (bytes: new byte[4] { 0x7F, 0x7F, 0xFF, 0xFF }, value: float.MaxValue),
+                (bytes: new byte[4] { 0xFF, 0x7F, 0xFF, 0xFF }, value: float.MinValue)
+            };
+        }
+
+        private static (byte[] bytes, double value)[] GetDoublePairs()
+        {
+            return new (byte[] bytes, double value)[]
+            {
+                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, value: 0d),
+                (bytes: new byte[8] { 0x3F, 0xB9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A }, value: +0.1d),
+                (bytes: new byte[8] { 0xBF, 0xB9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A }, value: -0.1d),
+                (bytes: new byte[8] { 0x3F, 0x84, 0x7A, 0xE1, 0x47, 0xAE, 0x14, 0x7B }, value: +0.01d),
+                (bytes: new byte[8] { 0xBF, 0x84, 0x7A, 0xE1, 0x47, 0xAE, 0x14, 0x7B }, value: -0.01d),
+                (bytes: new byte[8] { 0x3F, 0x1A, 0x36, 0xE2, 0xEB, 0x1C, 0x43, 0x2D }, value: +0.0001d),
+                (bytes: new byte[8] { 0xBF, 0x1A, 0x36, 0xE2, 0xEB, 0x1C, 0x43, 0x2D }, value: -0.0001d),
+                (bytes: new byte[8] { 0x3F, 0xF0,    0,    0,    0,    0,    0,    0 }, value: +1d),
+                (bytes: new byte[8] { 0xBF, 0xF0,    0,    0,    0,    0,    0,    0 }, value: -1d),
+                (bytes: new byte[8] { 0x40, 0x59,    0,    0,    0,    0,    0,    0 }, value: +100d),
+                (bytes: new byte[8] { 0xC0, 0x59,    0,    0,    0,    0,    0,    0 }, value: -100d),
+                (bytes: new byte[8] { 0x3F, 0xF3, 0xC0, 0xC1, 0xFC, 0x8F, 0x32, 0x38 }, value: +1.23456d),
+                (bytes: new byte[8] { 0xBF, 0xF3, 0xC0, 0xC1, 0xFC, 0x8F, 0x32, 0x38 }, value: -1.23456d),
+                (bytes: new byte[8] { 0x7F, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: double.MaxValue),
+                (bytes: new byte[8] { 0xFF, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: double.MinValue)
             };
         }
 
@@ -353,6 +437,199 @@ namespace JPAssets.Binary.Tests
 
                 // Test binary param method
                 Assert.AreEqual<uint>(value, BinaryConverter.ToUInt32(new Binary32(bytes[0], bytes[1], bytes[2], bytes[3])));
+            }
+        }
+
+        [TestMethod()]
+        public void Test_GetBytes_Int64()
+        {
+            foreach ((byte[] bytes, long value) in GetInt64Pairs())
+            {
+                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+
+                // Test out-byte method
+                {
+                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+
+                    Assert.AreEqual<byte>(bytes[0], b0);
+                    Assert.AreEqual<byte>(bytes[1], b1);
+                    Assert.AreEqual<byte>(bytes[2], b2);
+                    Assert.AreEqual<byte>(bytes[3], b3);
+                    Assert.AreEqual<byte>(bytes[4], b4);
+                    Assert.AreEqual<byte>(bytes[5], b5);
+                    Assert.AreEqual<byte>(bytes[6], b6);
+                    Assert.AreEqual<byte>(bytes[7], b7);
+                }
+
+                // Test binary-return method
+                {
+                    var bin64 = BinaryConverter.GetBytes(value);
+
+                    Assert.AreEqual<byte>(bytes[0], bin64.b0);
+                    Assert.AreEqual<byte>(bytes[1], bin64.b1);
+                    Assert.AreEqual<byte>(bytes[2], bin64.b2);
+                    Assert.AreEqual<byte>(bytes[3], bin64.b3);
+                    Assert.AreEqual<byte>(bytes[4], bin64.b4);
+                    Assert.AreEqual<byte>(bytes[5], bin64.b5);
+                    Assert.AreEqual<byte>(bytes[6], bin64.b6);
+                    Assert.AreEqual<byte>(bytes[7], bin64.b7);
+                }
+            }
+        }
+
+        [TestMethod()]
+        public void Test_ToInt64()
+        {
+            foreach ((byte[] bytes, long value) in GetInt64Pairs())
+            {
+                // Test byte param method
+                Assert.AreEqual<long>(value, BinaryConverter.ToInt64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
+
+                // Test binary param method
+                Assert.AreEqual<long>(value, BinaryConverter.ToInt64(new Binary64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])));
+            }
+        }
+
+        [TestMethod()]
+        public void Test_GetBytes_UInt64()
+        {
+            foreach ((byte[] bytes, ulong value) in GetUInt64Pairs())
+            {
+                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+
+                // Test out-byte method
+                {
+                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+
+                    Assert.AreEqual<byte>(bytes[0], b0);
+                    Assert.AreEqual<byte>(bytes[1], b1);
+                    Assert.AreEqual<byte>(bytes[2], b2);
+                    Assert.AreEqual<byte>(bytes[3], b3);
+                    Assert.AreEqual<byte>(bytes[4], b4);
+                    Assert.AreEqual<byte>(bytes[5], b5);
+                    Assert.AreEqual<byte>(bytes[6], b6);
+                    Assert.AreEqual<byte>(bytes[7], b7);
+                }
+
+                // Test binary-return method
+                {
+                    var bin64 = BinaryConverter.GetBytes(value);
+
+                    Assert.AreEqual<byte>(bytes[0], bin64.b0);
+                    Assert.AreEqual<byte>(bytes[1], bin64.b1);
+                    Assert.AreEqual<byte>(bytes[2], bin64.b2);
+                    Assert.AreEqual<byte>(bytes[3], bin64.b3);
+                    Assert.AreEqual<byte>(bytes[4], bin64.b4);
+                    Assert.AreEqual<byte>(bytes[5], bin64.b5);
+                    Assert.AreEqual<byte>(bytes[6], bin64.b6);
+                    Assert.AreEqual<byte>(bytes[7], bin64.b7);
+                }
+            }
+        }
+
+        [TestMethod()]
+        public void Test_ToUInt64()
+        {
+            foreach ((byte[] bytes, ulong value) in GetUInt64Pairs())
+            {
+                // Test byte param method
+                Assert.AreEqual<ulong>(value, BinaryConverter.ToUInt64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
+
+                // Test binary param method
+                Assert.AreEqual<ulong>(value, BinaryConverter.ToUInt64(new Binary64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])));
+            }
+        }
+
+        [TestMethod()]
+        public void Test_GetBytes_Single()
+        {
+            foreach ((byte[] bytes, float value) in GetSinglePairs())
+            {
+                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+
+                // Test out-byte method
+                {
+                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+
+                    Console.WriteLine($"{b0}, {b1}, {b2}, {b3}");
+                    Assert.AreEqual<byte>(bytes[0], b0);
+                    Assert.AreEqual<byte>(bytes[1], b1);
+                    Assert.AreEqual<byte>(bytes[2], b2);
+                    Assert.AreEqual<byte>(bytes[3], b3);
+                }
+
+                // Test binary-return method
+                {
+                    var bin32 = BinaryConverter.GetBytes(value);
+
+                    Assert.AreEqual<byte>(bytes[0], bin32.b0);
+                    Assert.AreEqual<byte>(bytes[1], bin32.b1);
+                    Assert.AreEqual<byte>(bytes[2], bin32.b2);
+                    Assert.AreEqual<byte>(bytes[3], bin32.b3);
+                }
+            }
+        }
+
+        [TestMethod()]
+        public void Test_Single()
+        {
+            foreach ((byte[] bytes, float value) in GetSinglePairs())
+            {
+                // Test byte param method
+                Assert.AreEqual<float>(value, BinaryConverter.ToSingle(bytes[0], bytes[1], bytes[2], bytes[3]));
+
+                // Test binary param method
+                Assert.AreEqual<float>(value, BinaryConverter.ToSingle(new Binary32(bytes[0], bytes[1], bytes[2], bytes[3])));
+            }
+        }
+
+        [TestMethod()]
+        public void Test_GetBytes_Double()
+        {
+            foreach ((byte[] bytes, double value) in GetDoublePairs())
+            {
+                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+
+                // Test out-byte method
+                {
+                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+
+                    Assert.AreEqual<byte>(bytes[0], b0);
+                    Assert.AreEqual<byte>(bytes[1], b1);
+                    Assert.AreEqual<byte>(bytes[2], b2);
+                    Assert.AreEqual<byte>(bytes[3], b3);
+                    Assert.AreEqual<byte>(bytes[4], b4);
+                    Assert.AreEqual<byte>(bytes[5], b5);
+                    Assert.AreEqual<byte>(bytes[6], b6);
+                    Assert.AreEqual<byte>(bytes[7], b7);
+                }
+
+                // Test binary-return method
+                {
+                    var bin64 = BinaryConverter.GetBytes(value);
+
+                    Assert.AreEqual<byte>(bytes[0], bin64.b0);
+                    Assert.AreEqual<byte>(bytes[1], bin64.b1);
+                    Assert.AreEqual<byte>(bytes[2], bin64.b2);
+                    Assert.AreEqual<byte>(bytes[3], bin64.b3);
+                    Assert.AreEqual<byte>(bytes[4], bin64.b4);
+                    Assert.AreEqual<byte>(bytes[5], bin64.b5);
+                    Assert.AreEqual<byte>(bytes[6], bin64.b6);
+                    Assert.AreEqual<byte>(bytes[7], bin64.b7);
+                }
+            }
+        }
+
+        [TestMethod()]
+        public void Test_ToDouble()
+        {
+            foreach ((byte[] bytes, double value) in GetDoublePairs())
+            {
+                // Test byte param method
+                Assert.AreEqual<double>(value, BinaryConverter.ToDouble(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
+
+                // Test binary param method
+                Assert.AreEqual<double>(value, BinaryConverter.ToDouble(new Binary64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])));
             }
         }
     }
