@@ -2,7 +2,6 @@
 
 namespace JPAssets.Binary
 {
-    // TODO: Create unit tests for endianness-reversing methods.
     public static class BinaryUtility
     {
         private static void SwapBytes(ref byte b0, ref byte b1)
@@ -29,6 +28,7 @@ namespace JPAssets.Binary
         }
 
         /// <inheritdoc cref="BinaryUtility.ReverseEndiannessInternal(byte*, int)"/>
+        /// <inheritdoc cref="ValidationUtility.CheckCount(int)"/>
         public static unsafe void ReverseEndianness(byte* ptr, int count)
         {
             ValidationUtility.CheckCount(count);
@@ -38,12 +38,20 @@ namespace JPAssets.Binary
         /// <param name="bytes">An array of bytes for which to reverse the endianness.</param>
         /// <param name="offset">Offset of the start index.</param>
         /// <inheritdoc cref="BinaryUtility.ReverseEndiannessInternal(byte*, int)"/>
+        /// /// <inheritdoc cref="ValidationUtility.CheckArrayOffsetAndCount{T}(T[], string, int, int)"/>
         public static unsafe void ReverseEndianness(byte[] bytes, int offset, int count)
         {
             ValidationUtility.CheckArrayOffsetAndCount(bytes, nameof(bytes), offset, count);
 
-            fixed (byte* ptr = bytes)
-                ReverseEndiannessInternal(ptr + offset, count);
+            if (offset == 0 && count == bytes.Length)
+            {
+                Array.Reverse(bytes);
+            }
+            else
+            {
+                fixed (byte* ptr = bytes)
+                    ReverseEndiannessInternal(ptr + offset, count);
+            }
         }
 
         /// <inheritdoc cref="BinaryUtility.ReverseEndianness(byte[], int, int)"/>
@@ -51,7 +59,7 @@ namespace JPAssets.Binary
         {
             _ = bytes ?? throw new ArgumentNullException(nameof(bytes));
 
-            ReverseEndianness(bytes, 0, bytes.Length);
+            Array.Reverse(bytes);
         }
 
         /// <param name="b0">This byte is swapped with <paramref name="b1"/>.</param>

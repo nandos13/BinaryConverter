@@ -207,7 +207,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Bool()
+        public void GetBytesFromBoolean()
         {
             Assert.AreEqual<byte>(0, BinaryConverter.GetBytes(false));
 
@@ -215,7 +215,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToBoolean()
+        public void BytesToBoolean()
         {
             foreach ((byte b, bool value) in GetBooleanPairs())
             {
@@ -224,7 +224,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_SByte()
+        public void GetBytesFromSByte()
         {
             foreach ((byte b, sbyte value) in GetSBytePairs())
             {
@@ -234,7 +234,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToSByte()
+        public void BytesToSByte()
         {
             foreach ((byte b, sbyte value) in GetSBytePairs())
             {
@@ -243,7 +243,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Char()
+        public void GetBytesFromChar()
         {
             foreach ((byte[] bytes, char value) in GetCharPairs())
             {
@@ -268,7 +268,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToChar()
+        public void BytesToChar()
         {
             foreach ((byte[] bytes, char value) in GetCharPairs())
             {
@@ -281,7 +281,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Int16()
+        public void GetBytesFromInt16()
         {
             foreach ((byte[] bytes, short value) in GetInt16Pairs())
             {
@@ -306,7 +306,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToInt16()
+        public void BytesToInt16()
         {
             foreach ((byte[] bytes, short value) in GetInt16Pairs())
             {
@@ -319,7 +319,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_UInt16()
+        public void GetBytesFromUInt16()
         {
             foreach ((byte[] bytes, ushort value) in GetUInt16Pairs())
             {
@@ -344,7 +344,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToUInt16()
+        public void BytesToUInt16()
         {
             foreach ((byte[] bytes, ushort value) in GetUInt16Pairs())
             {
@@ -357,7 +357,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Int32()
+        public void GetBytesFromInt32()
         {
             foreach ((byte[] bytes, int value) in GetInt32Pairs())
             {
@@ -386,7 +386,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToInt32()
+        public void BytesToInt32()
         {
             foreach ((byte[] bytes, int value) in GetInt32Pairs())
             {
@@ -399,7 +399,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_UInt32()
+        public void GetBytesFromUInt32()
         {
             foreach ((byte[] bytes, uint value) in GetUInt32Pairs())
             {
@@ -428,7 +428,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToUInt32()
+        public void BytesToUInt32()
         {
             foreach ((byte[] bytes, uint value) in GetUInt32Pairs())
             {
@@ -441,7 +441,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Int64()
+        public void GetBytesFromInt64()
         {
             foreach ((byte[] bytes, long value) in GetInt64Pairs())
             {
@@ -478,7 +478,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToInt64()
+        public void BytesToInt64()
         {
             foreach ((byte[] bytes, long value) in GetInt64Pairs())
             {
@@ -491,7 +491,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_UInt64()
+        public void GetBytesFromUInt64()
         {
             foreach ((byte[] bytes, ulong value) in GetUInt64Pairs())
             {
@@ -528,7 +528,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToUInt64()
+        public void BytesToUInt64()
         {
             foreach ((byte[] bytes, ulong value) in GetUInt64Pairs())
             {
@@ -541,7 +541,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Single()
+        public void GetBytesFromSingle()
         {
             foreach ((byte[] bytes, float value) in GetSinglePairs())
             {
@@ -571,7 +571,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_Single()
+        public void BytesToSingle()
         {
             foreach ((byte[] bytes, float value) in GetSinglePairs())
             {
@@ -584,7 +584,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_GetBytes_Double()
+        public void GetBytesFromDouble()
         {
             foreach ((byte[] bytes, double value) in GetDoublePairs())
             {
@@ -621,7 +621,7 @@ namespace JPAssets.Binary.Tests
         }
 
         [TestMethod()]
-        public void Test_ToDouble()
+        public void BytesToDouble()
         {
             foreach ((byte[] bytes, double value) in GetDoublePairs())
             {

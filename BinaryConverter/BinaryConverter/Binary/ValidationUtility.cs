@@ -4,23 +4,34 @@ namespace JPAssets.Binary
 {
     internal static class ValidationUtility
     {
-        internal static void CheckCount(int count, int upperBound = int.MaxValue)
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is less than 0.</exception>
+        internal static void CheckCount(int count)
         {
-            if (count < 0 || count > upperBound) throw new ArgumentOutOfRangeException(nameof(count));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
         }
 
-        internal static void CheckOffset(int offset, int upperBound)
-        {
-            if (offset < 0 || offset > upperBound) throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="array"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="offset"/> or <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="offset"/> and <paramref name="count"/> do not specify a valid range in <paramref name="array"/>.
+        /// </exception>
         internal static void CheckArrayOffsetAndCount<T>(T[] array, string arrayParamName, int offset, int count)
         {
             _ = array ?? throw new ArgumentNullException(arrayParamName);
 
+            if (offset < 0)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
             int length = array.Length;
-            ValidationUtility.CheckOffset(offset, length - 1);
-            ValidationUtility.CheckCount(count, length - offset);
+
+            if (offset >= length || count > length - offset)
+                throw new ArgumentException($"Offset and count do not specify a valid range in the array.", nameof(offset));
         }
     }
 }

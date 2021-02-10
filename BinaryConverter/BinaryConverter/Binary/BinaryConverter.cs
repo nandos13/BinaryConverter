@@ -1,6 +1,7 @@
 ﻿namespace JPAssets.Binary
 {
     // TODO: Add method documentation.
+    // TODO: Add support for big or little endianness.
     /// <summary>
     /// A collection of methods that can be used to convert most base data types to their byte values,
     /// as well as convert arbitrary bytes into base data types.

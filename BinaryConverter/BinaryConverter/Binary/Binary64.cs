@@ -31,6 +31,21 @@ namespace JPAssets.Binary
             this.b7 = b7;
         }
 
+        /// <inheritdoc cref="ValidationUtility.CheckArrayOffsetAndCount{T}(T[], string, int, int)"/>
+        public Binary64(byte[] buffer, int offset)
+        {
+            ValidationUtility.CheckArrayOffsetAndCount(buffer, nameof(buffer), offset, 8);
+
+            this.b0 = buffer[offset + 0];
+            this.b1 = buffer[offset + 1];
+            this.b2 = buffer[offset + 2];
+            this.b3 = buffer[offset + 3];
+            this.b4 = buffer[offset + 4];
+            this.b5 = buffer[offset + 5];
+            this.b6 = buffer[offset + 6];
+            this.b7 = buffer[offset + 7];
+        }
+
         public unsafe Binary64(byte* ptr)
         {
             this.b0 = *(ptr + 0);

@@ -55,6 +55,7 @@ namespace JPAssets.Binary
         }
 
         /// <inheritdoc cref="ToCharsInternal(byte*, int, char)"/>
+        /// <inheritdoc cref="ValidationUtility.CheckCount(int)"/>
         public static unsafe char[] ToChars(byte* ptr, int count, char delimeter = kNoDelimeter)
         {
             ValidationUtility.CheckCount(count);
@@ -65,6 +66,7 @@ namespace JPAssets.Binary
         /// Creates a <see cref="System.String"/> representing the given binary value.
         /// </summary>
         /// <inheritdoc cref="ToCharsInternal(byte*, int, char)"/>
+        /// <inheritdoc cref="ValidationUtility.CheckCount(int)"/>
         public static unsafe string ToString(byte* ptr, int count, char delimeter = kNoDelimeter)
         {
             ValidationUtility.CheckCount(count);
@@ -74,6 +76,7 @@ namespace JPAssets.Binary
         /// <param name="bytes">An array of bytes to create a string representation for.</param>
         /// <param name="offset">Offset of the start index.</param>
         /// <inheritdoc cref="BinaryStringUtility.ToCharsInternal(byte*, int, char)"/>
+        /// /// <inheritdoc cref="ValidationUtility.CheckArrayOffsetAndCount{T}(T[], string, int, int)"/>
         public static unsafe char[] ToChars(byte[] bytes, int offset, int count, char delimeter = kNoDelimeter)
         {
             ValidationUtility.CheckArrayOffsetAndCount(bytes, nameof(bytes), offset, count);
