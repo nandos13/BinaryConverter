@@ -12,9 +12,12 @@ namespace JPAssets.Binary.Tests
             return $"Asserting {typeof(T).FullName} value {value.ToString()} is equal to expected byte value {expected.ToString()}.";
         }
 
+        private static string ByteToString(byte b) => b.ToString();
+
         private static string GenerateGetBytesLogMessage<T>(T value, byte[] expected)
         {
-            return $"Asserting {typeof(T).FullName} value {value.ToString()} is equal to expected byte value ({string.Join(", ", expected.Select(b => b.ToString()))}).";
+            var byteStrings = expected.Select(new Func<byte, string>(ByteToString));
+            return $"Asserting {typeof(T).FullName} value {value.ToString()} is equal to expected byte value ({string.Join(", ", byteStrings)}).";
         }
 
         private static (byte b, bool value)[] GetBooleanPairs()
@@ -209,6 +212,7 @@ namespace JPAssets.Binary.Tests
         [TestMethod()]
         public void GetBytesFromBoolean()
         {
+            new BinaryConverter();
             Assert.AreEqual<byte>(0, BinaryConverter.GetBytes(false));
 
             Assert.AreNotEqual<byte>(0, BinaryConverter.GetBytes(true));
@@ -249,21 +253,10 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                }
-
-                // Test binary-return method
-                {
-                    var bin16 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin16.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin16.b1);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
             }
         }
 
@@ -287,21 +280,10 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                }
-
-                // Test binary-return method
-                {
-                    var bin16 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin16.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin16.b1);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
             }
         }
 
@@ -325,21 +307,10 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                }
-
-                // Test binary-return method
-                {
-                    var bin16 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin16.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin16.b1);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
             }
         }
 
@@ -363,25 +334,12 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                    Assert.AreEqual<byte>(bytes[2], b2);
-                    Assert.AreEqual<byte>(bytes[3], b3);
-                }
-
-                // Test binary-return method
-                {
-                    var bin32 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin32.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin32.b1);
-                    Assert.AreEqual<byte>(bytes[2], bin32.b2);
-                    Assert.AreEqual<byte>(bytes[3], bin32.b3);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
+                Assert.AreEqual<byte>(bytes[2], b2);
+                Assert.AreEqual<byte>(bytes[3], b3);
             }
         }
 
@@ -405,25 +363,12 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                    Assert.AreEqual<byte>(bytes[2], b2);
-                    Assert.AreEqual<byte>(bytes[3], b3);
-                }
-
-                // Test binary-return method
-                {
-                    var bin32 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin32.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin32.b1);
-                    Assert.AreEqual<byte>(bytes[2], bin32.b2);
-                    Assert.AreEqual<byte>(bytes[3], bin32.b3);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
+                Assert.AreEqual<byte>(bytes[2], b2);
+                Assert.AreEqual<byte>(bytes[3], b3);
             }
         }
 
@@ -447,33 +392,16 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                    Assert.AreEqual<byte>(bytes[2], b2);
-                    Assert.AreEqual<byte>(bytes[3], b3);
-                    Assert.AreEqual<byte>(bytes[4], b4);
-                    Assert.AreEqual<byte>(bytes[5], b5);
-                    Assert.AreEqual<byte>(bytes[6], b6);
-                    Assert.AreEqual<byte>(bytes[7], b7);
-                }
-
-                // Test binary-return method
-                {
-                    var bin64 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin64.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin64.b1);
-                    Assert.AreEqual<byte>(bytes[2], bin64.b2);
-                    Assert.AreEqual<byte>(bytes[3], bin64.b3);
-                    Assert.AreEqual<byte>(bytes[4], bin64.b4);
-                    Assert.AreEqual<byte>(bytes[5], bin64.b5);
-                    Assert.AreEqual<byte>(bytes[6], bin64.b6);
-                    Assert.AreEqual<byte>(bytes[7], bin64.b7);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
+                Assert.AreEqual<byte>(bytes[2], b2);
+                Assert.AreEqual<byte>(bytes[3], b3);
+                Assert.AreEqual<byte>(bytes[4], b4);
+                Assert.AreEqual<byte>(bytes[5], b5);
+                Assert.AreEqual<byte>(bytes[6], b6);
+                Assert.AreEqual<byte>(bytes[7], b7);
             }
         }
 
@@ -497,33 +425,16 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                    Assert.AreEqual<byte>(bytes[2], b2);
-                    Assert.AreEqual<byte>(bytes[3], b3);
-                    Assert.AreEqual<byte>(bytes[4], b4);
-                    Assert.AreEqual<byte>(bytes[5], b5);
-                    Assert.AreEqual<byte>(bytes[6], b6);
-                    Assert.AreEqual<byte>(bytes[7], b7);
-                }
-
-                // Test binary-return method
-                {
-                    var bin64 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin64.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin64.b1);
-                    Assert.AreEqual<byte>(bytes[2], bin64.b2);
-                    Assert.AreEqual<byte>(bytes[3], bin64.b3);
-                    Assert.AreEqual<byte>(bytes[4], bin64.b4);
-                    Assert.AreEqual<byte>(bytes[5], bin64.b5);
-                    Assert.AreEqual<byte>(bytes[6], bin64.b6);
-                    Assert.AreEqual<byte>(bytes[7], bin64.b7);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
+                Assert.AreEqual<byte>(bytes[2], b2);
+                Assert.AreEqual<byte>(bytes[3], b3);
+                Assert.AreEqual<byte>(bytes[4], b4);
+                Assert.AreEqual<byte>(bytes[5], b5);
+                Assert.AreEqual<byte>(bytes[6], b6);
+                Assert.AreEqual<byte>(bytes[7], b7);
             }
         }
 
@@ -547,26 +458,12 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
 
-                    Console.WriteLine($"{b0}, {b1}, {b2}, {b3}");
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                    Assert.AreEqual<byte>(bytes[2], b2);
-                    Assert.AreEqual<byte>(bytes[3], b3);
-                }
-
-                // Test binary-return method
-                {
-                    var bin32 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin32.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin32.b1);
-                    Assert.AreEqual<byte>(bytes[2], bin32.b2);
-                    Assert.AreEqual<byte>(bytes[3], bin32.b3);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
+                Assert.AreEqual<byte>(bytes[2], b2);
+                Assert.AreEqual<byte>(bytes[3], b3);
             }
         }
 
@@ -590,33 +487,16 @@ namespace JPAssets.Binary.Tests
             {
                 Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
 
-                // Test out-byte method
-                {
-                    BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
 
-                    Assert.AreEqual<byte>(bytes[0], b0);
-                    Assert.AreEqual<byte>(bytes[1], b1);
-                    Assert.AreEqual<byte>(bytes[2], b2);
-                    Assert.AreEqual<byte>(bytes[3], b3);
-                    Assert.AreEqual<byte>(bytes[4], b4);
-                    Assert.AreEqual<byte>(bytes[5], b5);
-                    Assert.AreEqual<byte>(bytes[6], b6);
-                    Assert.AreEqual<byte>(bytes[7], b7);
-                }
-
-                // Test binary-return method
-                {
-                    var bin64 = BinaryConverter.GetBytes(value);
-
-                    Assert.AreEqual<byte>(bytes[0], bin64.b0);
-                    Assert.AreEqual<byte>(bytes[1], bin64.b1);
-                    Assert.AreEqual<byte>(bytes[2], bin64.b2);
-                    Assert.AreEqual<byte>(bytes[3], bin64.b3);
-                    Assert.AreEqual<byte>(bytes[4], bin64.b4);
-                    Assert.AreEqual<byte>(bytes[5], bin64.b5);
-                    Assert.AreEqual<byte>(bytes[6], bin64.b6);
-                    Assert.AreEqual<byte>(bytes[7], bin64.b7);
-                }
+                Assert.AreEqual<byte>(bytes[0], b0);
+                Assert.AreEqual<byte>(bytes[1], b1);
+                Assert.AreEqual<byte>(bytes[2], b2);
+                Assert.AreEqual<byte>(bytes[3], b3);
+                Assert.AreEqual<byte>(bytes[4], b4);
+                Assert.AreEqual<byte>(bytes[5], b5);
+                Assert.AreEqual<byte>(bytes[6], b6);
+                Assert.AreEqual<byte>(bytes[7], b7);
             }
         }
 

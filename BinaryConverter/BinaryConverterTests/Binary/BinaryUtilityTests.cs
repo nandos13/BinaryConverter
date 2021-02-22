@@ -98,6 +98,27 @@ namespace JPAssets.Binary.Tests
         {
             var random = GetRandomAndLogSeed();
 
+            foreach (var length in new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 32, 64 })
+            {
+                // Get random bytes
+                var buffer = new byte[length];
+                random.NextBytes(buffer);
+
+                // Copy original buffer state
+                var copyBuffer = new byte[length];
+                Array.Copy(buffer, 0, copyBuffer, 0, length);
+
+                // Reverse entire buffer & test
+                BinaryUtility.ReverseEndianness(buffer, 0, length);
+                for (int i = 0; i < length; i++)
+                    Assert.AreEqual<byte>(copyBuffer[i], buffer[length - i - 1]);
+
+                // Reverse back to original endianness order & test
+                BinaryUtility.ReverseEndianness(buffer, 0, length);
+                for (int i = 0; i < length; i++)
+                    Assert.AreEqual<byte>(copyBuffer[i], buffer[i]);
+            }
+
             // TODO: Implement tests for ReverseEndianness(byte[])
             // TODO: Implement tests for ReverseEndianness(byte[], int, int)
             throw new NotImplementedException();

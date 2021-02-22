@@ -4,6 +4,12 @@ namespace JPAssets.Binary
 {
     public static class BinaryUtility
     {
+        internal static void CheckEndianness(Endianness value, string paramName)
+        {
+            if (value != Endianness.Little && value != Endianness.Big)
+                throw new ArgumentOutOfRangeException(paramName);
+        }
+
         private static void SwapBytes(ref byte b0, ref byte b1)
         {
             byte temp = b0;
