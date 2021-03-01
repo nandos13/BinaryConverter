@@ -1,37 +1,66 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+// TODO: Documentation
 namespace JPAssets.Binary
 {
     /// <summary>
     /// A 16-bit binary data structure.
     /// </summary>
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size = kByteCount)]
     [System.Diagnostics.DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public readonly struct Binary16 : IEquatable<Binary16>
     {
-        [FieldOffset(0x0)] public readonly byte b0;
-        [FieldOffset(0x1)] public readonly byte b1;
+        private const int kByteCount = 2;
 
-        public Binary16(byte b0, byte b1)
-        {
-            this.b0 = b0;
-            this.b1 = b1;
-        }
-
-        /// <inheritdoc cref="ValidationUtility.CheckArrayOffsetAndCount{T}(T[], string, int, int)"/>
-        public Binary16(byte[] buffer, int offset)
-        {
-            ValidationUtility.CheckArrayOffsetAndCount(buffer, nameof(buffer), offset, 2);
-
-            this.b0 = buffer[offset + 0];
-            this.b1 = buffer[offset + 1];
-        }
+        [FieldOffset(0)]
+        private readonly ushort m_data;
 
         public unsafe Binary16(byte* ptr)
         {
-            this.b0 = *(ptr + 0);
-            this.b1 = *(ptr + 1);
+            m_data = BinaryUtility.ToData<ushort>(*(ptr + 0), *(ptr + 1));
+        }
+
+        public unsafe Binary16(byte b0, byte b1)
+        {
+            var ptr = stackalloc byte[kByteCount] { b0, b1 };
+            this = new Binary16(ptr);
+        }
+
+        /// <inheritdoc cref="ValidationUtility.CheckArrayOffsetAndCount{T}(T[], string, int, int)"/>
+        public unsafe Binary16(byte[] buffer, int offset)
+        {
+            ValidationUtility.CheckArrayOffsetAndCount(buffer, nameof(buffer), offset, kByteCount);
+
+            fixed (byte* bufferPtr = buffer)
+            {
+                var offsetPtr = bufferPtr + offset;
+                this = new Binary16(offsetPtr);
+            }
+        }
+
+        public Binary16(char value)
+        {
+            unsafe
+            {
+                this = new Binary16((byte*)&value);
+            }
+        }
+
+        public Binary16(short value)
+        {
+            unsafe
+            {
+                this = new Binary16((byte*)&value);
+            }
+        }
+
+        public Binary16(ushort value)
+        {
+            unsafe
+            {
+                this = new Binary16((byte*)&value);
+            }
         }
 
         /// <summary>
@@ -39,13 +68,44 @@ namespace JPAssets.Binary
         /// </summary>
         public Binary16 Reverse()
         {
-            return new Binary16(b1, b0);
+            unsafe
+            {
+                var reversedData = BinaryUtility.ReverseEndianness(m_data);
+                return new Binary16((byte*)&reversedData);
+            }
+        }
+
+        public void ExtractBytes(out byte b0, out byte b1)
+        {
+            BinaryUtility.ExtractBytes(m_data, out b0, out b1);
+        }
+
+        public char AsChar()
+        {
+            unsafe
+            {
+                fixed (ushort* dataPtr = &m_data)
+                    return *(char*)dataPtr;
+            }
+        }
+
+        public short AsInt16()
+        {
+            unsafe
+            {
+                fixed (ushort* dataPtr = &m_data)
+                    return *(short*)dataPtr;
+            }
+        }
+
+        public ushort AsUInt16()
+        {
+            return m_data;
         }
 
         public bool Equals(Binary16 other)
         {
-            return b0.Equals(other.b0)
-                && b1.Equals(other.b1);
+            return m_data.Equals(other.m_data);
         }
 
         public override bool Equals(object obj)
@@ -55,7 +115,7 @@ namespace JPAssets.Binary
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(b0, b1);
+            return m_data.GetHashCode();
         }
 
         public static bool operator ==(Binary16 left, Binary16 right)
@@ -70,7 +130,11 @@ namespace JPAssets.Binary
 
         public override string ToString()
         {
-            return BinaryStringUtility.ToString(b0, b1, delimeter: ' ');
+            unsafe
+            {
+                fixed (ushort* dataPtr = &m_data)
+                    return BinaryStringUtility.ToString(ptr: (byte*)dataPtr, count: kByteCount, delimeter: ' ');
+            }
         }
 
         private string GetDebuggerDisplay()

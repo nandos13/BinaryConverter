@@ -1,516 +1,454 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace JPAssets.Binary.Tests
 {
+    /// <summary>
+    /// A collection of tests for the <see cref="BinaryConverter"/> class.
+    /// Note: Byte arrays declared within this class are defined in big-endian order
+    /// (most significant byte first) for readability.
+    /// </summary>
     [TestClass()]
     public class BinaryConverterTests
     {
-        private static string GenerateGetBytesLogMessage<T>(T value, byte expected)
-        {
-            return $"Asserting {typeof(T).FullName} value {value.ToString()} is equal to expected byte value {expected.ToString()}.";
-        }
-
         private static string ByteToString(byte b) => b.ToString();
 
-        private static string GenerateGetBytesLogMessage<T>(T value, byte[] expected)
+        private static string GenerateTestDataLogMessage<T>(byte[] bytes, T expected)
         {
-            var byteStrings = expected.Select(new Func<byte, string>(ByteToString));
-            return $"Asserting {typeof(T).FullName} value {value.ToString()} is equal to expected byte value ({string.Join(", ", byteStrings)}).";
+            var byteStrings = bytes.Select(new Func<byte, string>(ByteToString));
+            return $"Testing byte values ({string.Join(", ", byteStrings)}) against expected {typeof(T).FullName} value {expected.ToString()}.";
         }
 
-        private static (byte b, bool value)[] GetBooleanPairs()
+        private static IEnumerable<object[]> GetBooleanPairs()
         {
-            return new (byte b, bool value)[]
+            return new object[][]
             {
-                (b:    0, value: false),
-                (b: 0x01, value: true),
-                (b: 0x7F, value: true),
-                (b: 0x80, value: true),
-                (b: 0xFF, value: true)
+                new object[2] { (byte)   0, false },
+                new object[2] { (byte)0x01, true },
+                new object[2] { (byte)0x7F, true },
+                new object[2] { (byte)0x80, true },
+                new object[2] { (byte)0xFF, true }
             };
         }
 
-        private static (byte b, sbyte value)[] GetSBytePairs()
+        private static IEnumerable<object[]> GetSBytePairs()
         {
-            return new (byte b, sbyte value)[]
+            return new object[][]
             {
-                (b:    0, value: 0),
-                (b: 0x01, value: 1),
-                (b: 0x7F, value: 127),
-                (b: 0x80, value: -128),
-                (b: 0xFF, value: -1)
+                new object[2]{ (byte)   0, (sbyte)0 },
+                new object[2]{ (byte)0x01, (sbyte)1 },
+                new object[2]{ (byte)0x7F, (sbyte)127 },
+                new object[2]{ (byte)0x80, (sbyte)-128 },
+                new object[2]{ (byte)0xFF, (sbyte)-1 }
             };
         }
 
-        private static (byte[] bytes, char value)[] GetCharPairs()
+        private static IEnumerable<object[]> GetCharPairs()
         {
-            return new (byte[] bytes, char value)[]
+            return new object[][]
             {
-                (bytes: new byte[2] {    0,    0 }, value: (char)0),
-                (bytes: new byte[2] {    0, 0x01 }, value: (char)1),
-                (bytes: new byte[2] {    0, 0x80 }, value: (char)128),
-                (bytes: new byte[2] {    0, 0xFF }, value: (char)255),
-                (bytes: new byte[2] { 0x01,    0 }, value: (char)256),
-                (bytes: new byte[2] { 0x04,    0 }, value: (char)1024),
-                (bytes: new byte[2] { 0xFF, 0xFF }, value: (char)65535)
+                new object[2] { new byte[2] {    0,    0 }, (char)0 },
+                new object[2] { new byte[2] {    0, 0x01 }, (char)1 },
+                new object[2] { new byte[2] {    0, 0x80 }, (char)128 },
+                new object[2] { new byte[2] {    0, 0xFF }, (char)255 },
+                new object[2] { new byte[2] { 0x01,    0 }, (char)256 },
+                new object[2] { new byte[2] { 0x04,    0 }, (char)1024 },
+                new object[2] { new byte[2] { 0xFF, 0xFF }, (char)65535 }
             };
         }
 
-        private static (byte[] bytes, short value)[] GetInt16Pairs()
+        private static IEnumerable<object[]> GetInt16Pairs()
         {
-            return new (byte[] bytes, short value)[]
+            return new object[][]
             {
-                (bytes: new byte[2] {    0,    0 }, value: 0),
-                (bytes: new byte[2] {    0, 0x01 }, value: +1),
-                (bytes: new byte[2] {    0, 0x80 }, value: +128),
-                (bytes: new byte[2] {    0, 0xFF }, value: +255),
-                (bytes: new byte[2] { 0x01,    0 }, value: +256),
-                (bytes: new byte[2] { 0x04,    0 }, value: +1024),
-                (bytes: new byte[2] { 0x7F, 0xFF }, value: +32767),
-                (bytes: new byte[2] { 0x80,    0 }, value: -32768),
-                (bytes: new byte[2] { 0xFF, 0xFF }, value: -1)
+                new object[2] { new byte[2] {    0,    0 }, (short)0 },
+                new object[2] { new byte[2] {    0, 0x01 }, (short)+1 },
+                new object[2] { new byte[2] {    0, 0x80 }, (short)+128 },
+                new object[2] { new byte[2] {    0, 0xFF }, (short)+255 },
+                new object[2] { new byte[2] { 0x01,    0 }, (short)+256 },
+                new object[2] { new byte[2] { 0x04,    0 }, (short)+1024 },
+                new object[2] { new byte[2] { 0x7F, 0xFF }, (short)+32767 },
+                new object[2] { new byte[2] { 0x80,    0 }, (short)-32768 },
+                new object[2] { new byte[2] { 0xFF, 0xFF }, (short)-1 }
             };
         }
 
-        private static (byte[] bytes, ushort value)[] GetUInt16Pairs()
+        private static IEnumerable<object[]> GetUInt16Pairs()
         {
-            return new (byte[] bytes, ushort value)[]
+            return new object[][]
             {
-                (bytes: new byte[2] {    0,    0 }, value: 0),
-                (bytes: new byte[2] {    0, 0x01 }, value: 1),
-                (bytes: new byte[2] {    0, 0x80 }, value: 128),
-                (bytes: new byte[2] {    0, 0xFF }, value: 255),
-                (bytes: new byte[2] { 0x01,    0 }, value: 256),
-                (bytes: new byte[2] { 0x04,    0 }, value: 1024),
-                (bytes: new byte[2] { 0xFF, 0xFF }, value: 65535)
+                new object[2] { new byte[2] {    0,    0 }, (ushort)0 },
+                new object[2] { new byte[2] {    0, 0x01 }, (ushort)1 },
+                new object[2] { new byte[2] {    0, 0x80 }, (ushort)128 },
+                new object[2] { new byte[2] {    0, 0xFF }, (ushort)255 },
+                new object[2] { new byte[2] { 0x01,    0 }, (ushort)256 },
+                new object[2] { new byte[2] { 0x04,    0 }, (ushort)1024 },
+                new object[2] { new byte[2] { 0xFF, 0xFF }, (ushort)65535 }
             };
         }
 
-        private static (byte[] bytes, int value)[] GetInt32Pairs()
+        private static IEnumerable<object[]> GetInt32Pairs()
         {
-            return new (byte[] bytes, int value)[]
+            return new object[][]
             {
-                (bytes: new byte[4] {    0,    0,    0,    0 }, value: 0),
-                (bytes: new byte[4] {    0,    0,    0, 0x01 }, value: +1),
-                (bytes: new byte[4] {    0,    0,    0, 0x80 }, value: +128),
-                (bytes: new byte[4] {    0,    0,    0, 0xFF }, value: +255),
-                (bytes: new byte[4] {    0,    0, 0x01,    0 }, value: +256),
-                (bytes: new byte[4] {    0,    0, 0x04,    0 }, value: +1024),
-                (bytes: new byte[4] {    0,    0, 0x7F, 0xFF }, value: +32767),
-                (bytes: new byte[4] {    0, 0x80,    0,    0 }, value: +8388608),
-                (bytes: new byte[4] { 0x7F, 0xFF, 0xFF, 0xFF }, value: +2147483647),
-                (bytes: new byte[4] { 0x80,    0,    0,    0 }, value: -2147483648),
-                (bytes: new byte[4] { 0xFF, 0xFF, 0x80,    0 }, value: -32768),
-                (bytes: new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, value: -1)
+                new object[2] { new byte[4] {    0,    0,    0,    0 }, (int)0 },
+                new object[2] { new byte[4] {    0,    0,    0, 0x01 }, (int)+1 },
+                new object[2] { new byte[4] {    0,    0,    0, 0x80 }, (int)+128 },
+                new object[2] { new byte[4] {    0,    0,    0, 0xFF }, (int)+255 },
+                new object[2] { new byte[4] {    0,    0, 0x01,    0 }, (int)+256 },
+                new object[2] { new byte[4] {    0,    0, 0x04,    0 }, (int)+1024 },
+                new object[2] { new byte[4] {    0,    0, 0x7F, 0xFF }, (int)+32767 },
+                new object[2] { new byte[4] {    0, 0x80,    0,    0 }, (int)+8388608 },
+                new object[2] { new byte[4] { 0x7F, 0xFF, 0xFF, 0xFF }, (int)+2147483647 },
+                new object[2] { new byte[4] { 0x80,    0,    0,    0 }, (int)-2147483648 },
+                new object[2] { new byte[4] { 0xFF, 0xFF, 0x80,    0 }, (int)-32768 },
+                new object[2] { new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, (int)-1 }
             };
         }
 
-        private static (byte[] bytes, uint value)[] GetUInt32Pairs()
+        private static IEnumerable<object[]> GetUInt32Pairs()
         {
-            return new (byte[] bytes, uint value)[]
+            return new object[][]
             {
-                (bytes: new byte[4] {    0,    0,    0,    0 }, value: 0),
-                (bytes: new byte[4] {    0,    0,    0, 0x01 }, value: 1),
-                (bytes: new byte[4] {    0,    0,    0, 0x80 }, value: 128),
-                (bytes: new byte[4] {    0,    0,    0, 0xFF }, value: 255),
-                (bytes: new byte[4] {    0,    0, 0x01,    0 }, value: 256),
-                (bytes: new byte[4] {    0,    0, 0x04,    0 }, value: 1024),
-                (bytes: new byte[4] {    0,    0, 0x7F, 0xFF }, value: 32767),
-                (bytes: new byte[4] {    0, 0x80,    0,    0 }, value: 8388608),
-                (bytes: new byte[4] { 0x7F, 0xFF, 0xFF, 0xFF }, value: 2147483647),
-                (bytes: new byte[4] { 0x80,    0,    0,    0 }, value: 2147483648),
-                (bytes: new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, value: 4294967295)
+                new object[2] { new byte[4] {    0,    0,    0,    0 }, (uint)0 },
+                new object[2] { new byte[4] {    0,    0,    0, 0x01 }, (uint)1 },
+                new object[2] { new byte[4] {    0,    0,    0, 0x80 }, (uint)128 },
+                new object[2] { new byte[4] {    0,    0,    0, 0xFF }, (uint)255 },
+                new object[2] { new byte[4] {    0,    0, 0x01,    0 }, (uint)256 },
+                new object[2] { new byte[4] {    0,    0, 0x04,    0 }, (uint)1024 },
+                new object[2] { new byte[4] {    0,    0, 0x7F, 0xFF }, (uint)32767 },
+                new object[2] { new byte[4] {    0, 0x80,    0,    0 }, (uint)8388608 },
+                new object[2] { new byte[4] { 0x7F, 0xFF, 0xFF, 0xFF }, (uint)2147483647 },
+                new object[2] { new byte[4] { 0x80,    0,    0,    0 }, (uint)2147483648 },
+                new object[2] { new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, (uint)4294967295 }
             };
         }
 
-        private static (byte[] bytes, long value)[] GetInt64Pairs()
+        private static IEnumerable<object[]> GetInt64Pairs()
         {
-            return new (byte[] bytes, long value)[]
+            return new object[][]
             {
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, value: 0),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x01 }, value: +1),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x80 }, value: +128),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0xFF }, value: +255),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x01,    0 }, value: +256),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x04,    0 }, value: +1024),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x7F, 0xFF }, value: +32767),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0, 0x80,    0,    0 }, value: +8388608),
-                (bytes: new byte[8] {    0,    0,    0,    0, 0x7F, 0xFF, 0xFF, 0xFF }, value: +2147483647),
-                (bytes: new byte[8] { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: +9223372036854775807),
-                (bytes: new byte[8] { 0x80,    0,    0,    0,    0,    0,    0,    0 }, value: -9223372036854775808),
-                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    0 }, value: -256),
-                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: -1)
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, (long)0 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x01 }, (long)+1 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x80 }, (long)+128 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0xFF }, (long)+255 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0, 0x01,    0 }, (long)+256 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0, 0x04,    0 }, (long)+1024 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0, 0x7F, 0xFF }, (long)+32767 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0, 0x80,    0,    0 }, (long)+8388608 },
+                new object[2] { new byte[8] {    0,    0,    0,    0, 0x7F, 0xFF, 0xFF, 0xFF }, (long)+2147483647 },
+                new object[2] { new byte[8] { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, (long)+9223372036854775807 },
+                new object[2] { new byte[8] { 0x80,    0,    0,    0,    0,    0,    0,    0 }, (long)-9223372036854775808 },
+                new object[2] { new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    0 }, (long)-256 },
+                new object[2] { new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, (long)-1 }
             };
         }
 
-        private static (byte[] bytes, ulong value)[] GetUInt64Pairs()
+        private static IEnumerable<object[]> GetUInt64Pairs()
         {
-            return new (byte[] bytes, ulong value)[]
+            return new object[][]
             {
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, value: 0),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x01 }, value: 1),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x80 }, value: 128),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0xFF }, value: 255),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x01,    0 }, value: 256),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x04,    0 }, value: 1024),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0, 0x7F, 0xFF }, value: 32767),
-                (bytes: new byte[8] {    0,    0,    0,    0,    0, 0x80,    0,    0 }, value: 8388608),
-                (bytes: new byte[8] {    0,    0,    0,    0, 0x7F, 0xFF, 0xFF, 0xFF }, value: 2147483647),
-                (bytes: new byte[8] {    0,    0,    0,    0, 0x80,    0,    0,    0 }, value: 2147483648),
-                (bytes: new byte[8] {    0,    0,    0,    0, 0xFF, 0xFF, 0xFF, 0xFF }, value: 4294967295),
-                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    0 }, value: 18446744073709551360),
-                (bytes: new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: 18446744073709551615)
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, (ulong)0 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x01 }, (ulong)1 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0x80 }, (ulong)128 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0, 0xFF }, (ulong)255 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0, 0x01,    0 }, (ulong)256 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0, 0x04,    0 }, (ulong)1024 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0, 0x7F, 0xFF }, (ulong)32767 },
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0, 0x80,    0,    0 }, (ulong)8388608 },
+                new object[2] { new byte[8] {    0,    0,    0,    0, 0x7F, 0xFF, 0xFF, 0xFF }, (ulong)2147483647 },
+                new object[2] { new byte[8] {    0,    0,    0,    0, 0x80,    0,    0,    0 }, (ulong)2147483648 },
+                new object[2] { new byte[8] {    0,    0,    0,    0, 0xFF, 0xFF, 0xFF, 0xFF }, (ulong)4294967295 },
+                new object[2] { new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    0 }, (ulong)18446744073709551360 },
+                new object[2] { new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, (ulong)18446744073709551615 }
             };
         }
 
-        private static (byte[] bytes, float value)[] GetSinglePairs()
+        private static IEnumerable<object[]> GetSinglePairs()
         {
-            return new (byte[] bytes, float value)[]
+            return new object[][]
             {
-                (bytes: new byte[4] {    0,    0,    0,    0 }, value: 0f),
-                (bytes: new byte[4] { 0x3D, 0xCC, 0xCC, 0xCD }, value: +0.1f),
-                (bytes: new byte[4] { 0xBD, 0xCC, 0xCC, 0xCD }, value: -0.1f),
-                (bytes: new byte[4] { 0x3C, 0x23, 0xD7, 0x0A }, value: +0.01f),
-                (bytes: new byte[4] { 0xBC, 0x23, 0xD7, 0x0A }, value: -0.01f),
-                (bytes: new byte[4] { 0x38, 0xD1, 0xB7, 0x17 }, value: +0.0001f),
-                (bytes: new byte[4] { 0xB8, 0xD1, 0xB7, 0x17 }, value: -0.0001f),
-                (bytes: new byte[4] { 0x3F, 0x80,    0,    0 }, value: +1f),
-                (bytes: new byte[4] { 0xBF, 0x80,    0,    0 }, value: -1f),
-                (bytes: new byte[4] { 0x42, 0xC8,    0,    0 }, value: +100f),
-                (bytes: new byte[4] { 0xC2, 0xC8,    0,    0 }, value: -100f),
-                (bytes: new byte[4] { 0x3F, 0x9E, 0x06, 0x10 }, value: +1.23456f),
-                (bytes: new byte[4] { 0xBF, 0x9E, 0x06, 0x10 }, value: -1.23456f),
-                (bytes: new byte[4] { 0x7F, 0x7F, 0xFF, 0xFF }, value: float.MaxValue),
-                (bytes: new byte[4] { 0xFF, 0x7F, 0xFF, 0xFF }, value: float.MinValue)
+                new object[2] { new byte[4] {    0,    0,    0,    0 }, (float)0f },
+                new object[2] { new byte[4] { 0x3D, 0xCC, 0xCC, 0xCD }, (float)+0.1f },
+                new object[2] { new byte[4] { 0xBD, 0xCC, 0xCC, 0xCD }, (float)-0.1f },
+                new object[2] { new byte[4] { 0x3C, 0x23, 0xD7, 0x0A }, (float)+0.01f },
+                new object[2] { new byte[4] { 0xBC, 0x23, 0xD7, 0x0A }, (float)-0.01f },
+                new object[2] { new byte[4] { 0x38, 0xD1, 0xB7, 0x17 }, (float)+0.0001f },
+                new object[2] { new byte[4] { 0xB8, 0xD1, 0xB7, 0x17 }, (float)-0.0001f },
+                new object[2] { new byte[4] { 0x3F, 0x80,    0,    0 }, (float)+1f },
+                new object[2] { new byte[4] { 0xBF, 0x80,    0,    0 }, (float)-1f },
+                new object[2] { new byte[4] { 0x42, 0xC8,    0,    0 }, (float)+100f },
+                new object[2] { new byte[4] { 0xC2, 0xC8,    0,    0 }, (float)-100f },
+                new object[2] { new byte[4] { 0x3F, 0x9E, 0x06, 0x10 }, (float)+1.23456f },
+                new object[2] { new byte[4] { 0xBF, 0x9E, 0x06, 0x10 }, (float)-1.23456f },
+                new object[2] { new byte[4] { 0x7F, 0x7F, 0xFF, 0xFF }, (float)float.MaxValue },
+                new object[2] { new byte[4] { 0xFF, 0x7F, 0xFF, 0xFF }, (float)float.MinValue }
             };
         }
 
-        private static (byte[] bytes, double value)[] GetDoublePairs()
+        private static IEnumerable<object[]> GetDoublePairs()
         {
-            return new (byte[] bytes, double value)[]
+            return new object[][]
             {
-                (bytes: new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, value: 0d),
-                (bytes: new byte[8] { 0x3F, 0xB9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A }, value: +0.1d),
-                (bytes: new byte[8] { 0xBF, 0xB9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A }, value: -0.1d),
-                (bytes: new byte[8] { 0x3F, 0x84, 0x7A, 0xE1, 0x47, 0xAE, 0x14, 0x7B }, value: +0.01d),
-                (bytes: new byte[8] { 0xBF, 0x84, 0x7A, 0xE1, 0x47, 0xAE, 0x14, 0x7B }, value: -0.01d),
-                (bytes: new byte[8] { 0x3F, 0x1A, 0x36, 0xE2, 0xEB, 0x1C, 0x43, 0x2D }, value: +0.0001d),
-                (bytes: new byte[8] { 0xBF, 0x1A, 0x36, 0xE2, 0xEB, 0x1C, 0x43, 0x2D }, value: -0.0001d),
-                (bytes: new byte[8] { 0x3F, 0xF0,    0,    0,    0,    0,    0,    0 }, value: +1d),
-                (bytes: new byte[8] { 0xBF, 0xF0,    0,    0,    0,    0,    0,    0 }, value: -1d),
-                (bytes: new byte[8] { 0x40, 0x59,    0,    0,    0,    0,    0,    0 }, value: +100d),
-                (bytes: new byte[8] { 0xC0, 0x59,    0,    0,    0,    0,    0,    0 }, value: -100d),
-                (bytes: new byte[8] { 0x3F, 0xF3, 0xC0, 0xC1, 0xFC, 0x8F, 0x32, 0x38 }, value: +1.23456d),
-                (bytes: new byte[8] { 0xBF, 0xF3, 0xC0, 0xC1, 0xFC, 0x8F, 0x32, 0x38 }, value: -1.23456d),
-                (bytes: new byte[8] { 0x7F, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: double.MaxValue),
-                (bytes: new byte[8] { 0xFF, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, value: double.MinValue)
+                new object[2] { new byte[8] {    0,    0,    0,    0,    0,    0,    0,    0 }, (double)0d },
+                new object[2] { new byte[8] { 0x3F, 0xB9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A }, (double)+0.1d },
+                new object[2] { new byte[8] { 0xBF, 0xB9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A }, (double)-0.1d },
+                new object[2] { new byte[8] { 0x3F, 0x84, 0x7A, 0xE1, 0x47, 0xAE, 0x14, 0x7B }, (double)+0.01d },
+                new object[2] { new byte[8] { 0xBF, 0x84, 0x7A, 0xE1, 0x47, 0xAE, 0x14, 0x7B }, (double)-0.01d },
+                new object[2] { new byte[8] { 0x3F, 0x1A, 0x36, 0xE2, 0xEB, 0x1C, 0x43, 0x2D }, (double)+0.0001d },
+                new object[2] { new byte[8] { 0xBF, 0x1A, 0x36, 0xE2, 0xEB, 0x1C, 0x43, 0x2D }, (double)-0.0001d },
+                new object[2] { new byte[8] { 0x3F, 0xF0,    0,    0,    0,    0,    0,    0 }, (double)+1d },
+                new object[2] { new byte[8] { 0xBF, 0xF0,    0,    0,    0,    0,    0,    0 }, (double)-1d },
+                new object[2] { new byte[8] { 0x40, 0x59,    0,    0,    0,    0,    0,    0 }, (double)+100d },
+                new object[2] { new byte[8] { 0xC0, 0x59,    0,    0,    0,    0,    0,    0 }, (double)-100d },
+                new object[2] { new byte[8] { 0x3F, 0xF3, 0xC0, 0xC1, 0xFC, 0x8F, 0x32, 0x38 }, (double)+1.23456d },
+                new object[2] { new byte[8] { 0xBF, 0xF3, 0xC0, 0xC1, 0xFC, 0x8F, 0x32, 0x38 }, (double)-1.23456d },
+                new object[2] { new byte[8] { 0x7F, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, (double)double.MaxValue },
+                new object[2] { new byte[8] { 0xFF, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, (double)double.MinValue }
             };
+        }
+
+        private static void PreprocessTestData<T>(byte[] bytes, T expected)
+        {
+            // Convert from big-endian to little-endian bytes.
+            if (System.BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            Console.WriteLine(GenerateTestDataLogMessage(bytes, expected));
+        }
+
+        private static void PreprocessTestData<T>(byte b, T expected)
+        {
+            Console.WriteLine(GenerateTestDataLogMessage(new byte[] { b }, expected));
         }
 
         [TestMethod()]
         public void GetBytesFromBoolean()
         {
-            new BinaryConverter();
-            Assert.AreEqual<byte>(0, BinaryConverter.GetBytes(false));
+            BinaryConverter.GetBytes(false, out byte falseByte);
+            Assert.AreEqual<byte>(0, falseByte);
 
-            Assert.AreNotEqual<byte>(0, BinaryConverter.GetBytes(true));
+            BinaryConverter.GetBytes(true, out byte trueByte);
+            Assert.AreNotEqual<byte>(0, trueByte);
         }
 
+        [DynamicData(nameof(GetBooleanPairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToBoolean()
+        public void BytesToBoolean(byte b, bool value)
         {
-            foreach ((byte b, bool value) in GetBooleanPairs())
-            {
-                Assert.AreEqual<bool>(value, BinaryConverter.ToBoolean(b));
-            }
+            PreprocessTestData(b, value);
+
+            Assert.AreEqual<bool>(value, BinaryConverter.ToBoolean(b));
         }
 
+        [DynamicData(nameof(GetSBytePairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromSByte()
+        public void GetBytesFromSByte(byte b, sbyte value)
         {
-            foreach ((byte b, sbyte value) in GetSBytePairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, b));
-                Assert.AreEqual<byte>(b, BinaryConverter.GetBytes(value));
-            }
+            PreprocessTestData(b, value);
+
+            BinaryConverter.GetBytes(value, out byte b0);
+            Assert.AreEqual<byte>(b, b0);
         }
 
+        [DynamicData(nameof(GetSBytePairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToSByte()
+        public void BytesToSByte(byte b, sbyte value)
         {
-            foreach ((byte b, sbyte value) in GetSBytePairs())
-            {
-                Assert.AreEqual<sbyte>(value, BinaryConverter.ToSByte(b));
-            }
+            PreprocessTestData(b, value);
+
+            Assert.AreEqual<sbyte>(value, BinaryConverter.ToSByte(b));
         }
 
+        [DynamicData(nameof(GetCharPairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromChar()
+        public void GetBytesFromChar(byte[] bytes, char value)
         {
-            foreach ((byte[] bytes, char value) in GetCharPairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+            var resultingBytes = new[] { b0, b1 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetCharPairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToChar()
+        public void BytesToChar(byte[] bytes, char value)
         {
-            foreach ((byte[] bytes, char value) in GetCharPairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<char>(value, BinaryConverter.ToChar(bytes[0], bytes[1]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<char>(value, BinaryConverter.ToChar(new Binary16(bytes[0], bytes[1])));
-            }
+            Assert.AreEqual<char>(value, BinaryConverter.ToChar(bytes[0], bytes[1]));
         }
 
+        [DynamicData(nameof(GetInt16Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromInt16()
+        public void GetBytesFromInt16(byte[] bytes, short value)
         {
-            foreach ((byte[] bytes, short value) in GetInt16Pairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+            var resultingBytes = new[] { b0, b1 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetInt16Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToInt16()
+        public void BytesToInt16(byte[] bytes, short value)
         {
-            foreach ((byte[] bytes, short value) in GetInt16Pairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<short>(value, BinaryConverter.ToInt16(bytes[0], bytes[1]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<short>(value, BinaryConverter.ToInt16(new Binary16(bytes[0], bytes[1])));
-            }
+            Assert.AreEqual<short>(value, BinaryConverter.ToInt16(bytes[0], bytes[1]));
         }
 
+        [DynamicData(nameof(GetUInt16Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromUInt16()
+        public void GetBytesFromUInt16(byte[] bytes, ushort value)
         {
-            foreach ((byte[] bytes, ushort value) in GetUInt16Pairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1);
+            var resultingBytes = new[] { b0, b1 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetUInt16Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToUInt16()
+        public void BytesToUInt16(byte[] bytes, ushort value)
         {
-            foreach ((byte[] bytes, ushort value) in GetUInt16Pairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<ushort>(value, BinaryConverter.ToUInt16(bytes[0], bytes[1]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<ushort>(value, BinaryConverter.ToUInt16(new Binary16(bytes[0], bytes[1])));
-            }
+            Assert.AreEqual<ushort>(value, BinaryConverter.ToUInt16(bytes[0], bytes[1]));
         }
 
+        [DynamicData(nameof(GetInt32Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromInt32()
+        public void GetBytesFromInt32(byte[] bytes, int value)
         {
-            foreach ((byte[] bytes, int value) in GetInt32Pairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+            var resultingBytes = new[] { b0, b1, b2, b3 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-                Assert.AreEqual<byte>(bytes[2], b2);
-                Assert.AreEqual<byte>(bytes[3], b3);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetInt32Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToInt32()
+        public void BytesToInt32(byte[] bytes, int value)
         {
-            foreach ((byte[] bytes, int value) in GetInt32Pairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<int>(value, BinaryConverter.ToInt32(bytes[0], bytes[1], bytes[2], bytes[3]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<int>(value, BinaryConverter.ToInt32(new Binary32(bytes[0], bytes[1], bytes[2], bytes[3])));
-            }
+            Assert.AreEqual<int>(value, BinaryConverter.ToInt32(bytes[0], bytes[1], bytes[2], bytes[3]));
         }
 
+        [DynamicData(nameof(GetUInt32Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromUInt32()
+        public void GetBytesFromUInt32(byte[] bytes, uint value)
         {
-            foreach ((byte[] bytes, uint value) in GetUInt32Pairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+            var resultingBytes = new[] { b0, b1, b2, b3 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-                Assert.AreEqual<byte>(bytes[2], b2);
-                Assert.AreEqual<byte>(bytes[3], b3);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetUInt32Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToUInt32()
+        public void BytesToUInt32(byte[] bytes, uint value)
         {
-            foreach ((byte[] bytes, uint value) in GetUInt32Pairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<uint>(value, BinaryConverter.ToUInt32(bytes[0], bytes[1], bytes[2], bytes[3]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<uint>(value, BinaryConverter.ToUInt32(new Binary32(bytes[0], bytes[1], bytes[2], bytes[3])));
-            }
+            Assert.AreEqual<uint>(value, BinaryConverter.ToUInt32(bytes[0], bytes[1], bytes[2], bytes[3]));
         }
 
+        [DynamicData(nameof(GetInt64Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromInt64()
+        public void GetBytesFromInt64(byte[] bytes, long value)
         {
-            foreach ((byte[] bytes, long value) in GetInt64Pairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+            var resultingBytes = new[] { b0, b1, b2, b3, b4, b5, b6, b7 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-                Assert.AreEqual<byte>(bytes[2], b2);
-                Assert.AreEqual<byte>(bytes[3], b3);
-                Assert.AreEqual<byte>(bytes[4], b4);
-                Assert.AreEqual<byte>(bytes[5], b5);
-                Assert.AreEqual<byte>(bytes[6], b6);
-                Assert.AreEqual<byte>(bytes[7], b7);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetInt64Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToInt64()
+        public void BytesToInt64(byte[] bytes, long value)
         {
-            foreach ((byte[] bytes, long value) in GetInt64Pairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<long>(value, BinaryConverter.ToInt64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<long>(value, BinaryConverter.ToInt64(new Binary64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])));
-            }
+            Assert.AreEqual<long>(value, BinaryConverter.ToInt64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
         }
 
+        [DynamicData(nameof(GetUInt64Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromUInt64()
+        public void GetBytesFromUInt64(byte[] bytes, ulong value)
         {
-            foreach ((byte[] bytes, ulong value) in GetUInt64Pairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+            var resultingBytes = new[] { b0, b1, b2, b3, b4, b5, b6, b7 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-                Assert.AreEqual<byte>(bytes[2], b2);
-                Assert.AreEqual<byte>(bytes[3], b3);
-                Assert.AreEqual<byte>(bytes[4], b4);
-                Assert.AreEqual<byte>(bytes[5], b5);
-                Assert.AreEqual<byte>(bytes[6], b6);
-                Assert.AreEqual<byte>(bytes[7], b7);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetUInt64Pairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToUInt64()
+        public void BytesToUInt64(byte[] bytes, ulong value)
         {
-            foreach ((byte[] bytes, ulong value) in GetUInt64Pairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<ulong>(value, BinaryConverter.ToUInt64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<ulong>(value, BinaryConverter.ToUInt64(new Binary64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])));
-            }
+            Assert.AreEqual<ulong>(value, BinaryConverter.ToUInt64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
         }
 
+        [DynamicData(nameof(GetSinglePairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromSingle()
+        public void GetBytesFromSingle(byte[] bytes, float value)
         {
-            foreach ((byte[] bytes, float value) in GetSinglePairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3);
+            var resultingBytes = new[] { b0, b1, b2, b3 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-                Assert.AreEqual<byte>(bytes[2], b2);
-                Assert.AreEqual<byte>(bytes[3], b3);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetSinglePairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToSingle()
+        public void BytesToSingle(byte[] bytes, float value)
         {
-            foreach ((byte[] bytes, float value) in GetSinglePairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<float>(value, BinaryConverter.ToSingle(bytes[0], bytes[1], bytes[2], bytes[3]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<float>(value, BinaryConverter.ToSingle(new Binary32(bytes[0], bytes[1], bytes[2], bytes[3])));
-            }
+            Assert.AreEqual<float>(value, BinaryConverter.ToSingle(bytes[0], bytes[1], bytes[2], bytes[3]));
         }
 
+        [DynamicData(nameof(GetDoublePairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void GetBytesFromDouble()
+        public void GetBytesFromDouble(byte[] bytes, double value)
         {
-            foreach ((byte[] bytes, double value) in GetDoublePairs())
-            {
-                Console.WriteLine(GenerateGetBytesLogMessage(value, bytes));
+            PreprocessTestData(bytes, value);
 
-                BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+            BinaryConverter.GetBytes(value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7);
+            var resultingBytes = new[] { b0, b1, b2, b3, b4, b5, b6, b7 };
 
-                Assert.AreEqual<byte>(bytes[0], b0);
-                Assert.AreEqual<byte>(bytes[1], b1);
-                Assert.AreEqual<byte>(bytes[2], b2);
-                Assert.AreEqual<byte>(bytes[3], b3);
-                Assert.AreEqual<byte>(bytes[4], b4);
-                Assert.AreEqual<byte>(bytes[5], b5);
-                Assert.AreEqual<byte>(bytes[6], b6);
-                Assert.AreEqual<byte>(bytes[7], b7);
-            }
+            CollectionAssert.AreEqual(bytes, resultingBytes);
         }
 
+        [DynamicData(nameof(GetDoublePairs), DynamicDataSourceType.Method)]
         [TestMethod()]
-        public void BytesToDouble()
+        public void BytesToDouble(byte[] bytes, double value)
         {
-            foreach ((byte[] bytes, double value) in GetDoublePairs())
-            {
-                // Test byte param method
-                Assert.AreEqual<double>(value, BinaryConverter.ToDouble(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
+            PreprocessTestData(bytes, value);
 
-                // Test binary param method
-                Assert.AreEqual<double>(value, BinaryConverter.ToDouble(new Binary64(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])));
-            }
+            Assert.AreEqual<double>(value, BinaryConverter.ToDouble(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]));
         }
     }
 }

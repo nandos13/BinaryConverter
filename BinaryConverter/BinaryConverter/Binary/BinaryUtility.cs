@@ -4,10 +4,78 @@ namespace JPAssets.Binary
 {
     public static class BinaryUtility
     {
-        internal static void CheckEndianness(Endianness value, string paramName)
+        private static unsafe void CheckSize<T>(int expected) where T : unmanaged
         {
-            if (value != Endianness.Little && value != Endianness.Big)
-                throw new ArgumentOutOfRangeException(paramName);
+            if (sizeof(T) != expected)
+                throw new ArgumentException($"Expected generic argument of size {expected.ToString()}.", nameof(T));
+        }
+
+        internal static unsafe void ExtractBytes<T>(T value, out byte b0, out byte b1)
+            where T : unmanaged
+        {
+            CheckSize<T>(2);
+
+            var bytes = (byte*)&value;
+
+            b0 = bytes[0];
+            b1 = bytes[1];
+        }
+
+        internal static unsafe void ExtractBytes<T>(T value, out byte b0, out byte b1, out byte b2, out byte b3)
+            where T : unmanaged
+        {
+            CheckSize<T>(4);
+
+            var bytes = (byte*)&value;
+
+            b0 = bytes[0];
+            b1 = bytes[1];
+            b2 = bytes[2];
+            b3 = bytes[3];
+        }
+
+        internal static unsafe void ExtractBytes<T>(T value, out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7)
+            where T : unmanaged
+        {
+            CheckSize<T>(8);
+
+            var bytes = (byte*)&value;
+
+            b0 = bytes[0];
+            b1 = bytes[1];
+            b2 = bytes[2];
+            b3 = bytes[3];
+            b4 = bytes[4];
+            b5 = bytes[5];
+            b6 = bytes[6];
+            b7 = bytes[7];
+        }
+
+        internal static unsafe T ToData<T>(byte b0, byte b1)
+            where T : unmanaged
+        {
+            CheckSize<T>(2);
+
+            var bytes = stackalloc byte[2] { b0, b1 };
+            return *(T*)bytes;
+        }
+
+        internal static unsafe T ToData<T>(byte b0, byte b1, byte b2, byte b3)
+            where T : unmanaged
+        {
+            CheckSize<T>(4);
+
+            var bytes = stackalloc byte[4] { b0, b1, b2, b3 };
+            return *(T*)bytes;
+        }
+
+        internal static unsafe T ToData<T>(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+            where T : unmanaged
+        {
+            CheckSize<T>(8);
+
+            var bytes = stackalloc byte[8] { b0, b1, b2, b3, b4, b5, b6, b7 };
+            return *(T*)bytes;
         }
 
         private static void SwapBytes(ref byte b0, ref byte b1)
@@ -63,63 +131,18 @@ namespace JPAssets.Binary
         /// <inheritdoc cref="BinaryUtility.ReverseEndianness(byte[], int, int)"/>
         public static unsafe void ReverseEndianness(byte[] bytes)
         {
-            _ = bytes ?? throw new ArgumentNullException(nameof(bytes));
-
-            Array.Reverse(bytes);
+            Array.Reverse(bytes ?? throw new ArgumentNullException(nameof(bytes)));
         }
 
-        /// <param name="b0">This byte is swapped with <paramref name="b1"/>.</param>
-        /// <param name="b1">This byte is swapped with <paramref name="b0"/>.</param>
-        /// <inheritdoc cref="ReverseEndiannessInternal(byte*, int)"/>
-        public static void ReverseEndianness(ref byte b0, ref byte b1)
+        /// <summary>
+        /// Returns the given value with reversed endianness.
+        /// </summary>
+        /// <typeparam name="T">The type of unmanaged data to operate on.</typeparam>
+        /// <param name="value">The value to reverse.</param>
+        public static unsafe T ReverseEndianness<T>(T value) where T : unmanaged
         {
-            SwapBytes(ref b0, ref b1);
-        }
-
-        /// <param name="b0">This byte is swapped with <paramref name="b3"/>.</param>
-        /// <param name="b1">This byte is swapped with <paramref name="b2"/>.</param>
-        /// <param name="b2">This byte is swapped with <paramref name="b1"/>.</param>
-        /// <param name="b3">This byte is swapped with <paramref name="b0"/>.</param>
-        /// <inheritdoc cref="ReverseEndianness(ref byte, ref byte)"/>
-        public static void ReverseEndianness(ref byte b0, ref byte b1, ref byte b2, ref byte b3)
-        {
-            SwapBytes(ref b0, ref b3);
-            SwapBytes(ref b1, ref b2);
-        }
-
-        /// <param name="b0">This byte is swapped with <paramref name="b7"/>.</param>
-        /// <param name="b1">This byte is swapped with <paramref name="b6"/>.</param>
-        /// <param name="b2">This byte is swapped with <paramref name="b5"/>.</param>
-        /// <param name="b3">This byte is swapped with <paramref name="b4"/>.</param>
-        /// <param name="b4">This byte is swapped with <paramref name="b3"/>.</param>
-        /// <param name="b5">This byte is swapped with <paramref name="b2"/>.</param>
-        /// <param name="b6">This byte is swapped with <paramref name="b1"/>.</param>
-        /// <param name="b7">This byte is swapped with <paramref name="b0"/>.</param>
-        /// <inheritdoc cref="ReverseEndianness(ref byte, ref byte)"/>
-        public static void ReverseEndianness(ref byte b0, ref byte b1, ref byte b2, ref byte b3, ref byte b4, ref byte b5, ref byte b6, ref byte b7)
-        {
-            SwapBytes(ref b0, ref b7);
-            SwapBytes(ref b1, ref b6);
-            SwapBytes(ref b2, ref b5);
-            SwapBytes(ref b3, ref b4);
-        }
-
-        /// <inheritdoc cref="Binary16.Reverse"/>
-        public static Binary16 ReverseEndianness(Binary16 bin)
-        {
-            return bin.Reverse();
-        }
-
-        /// <inheritdoc cref="Binary32.Reverse"/>
-        public static Binary32 ReverseEndianness(Binary32 bin)
-        {
-            return bin.Reverse();
-        }
-
-        /// <inheritdoc cref="Binary64.Reverse"/>
-        public static Binary64 ReverseEndianness(Binary64 bin)
-        {
-            return bin.Reverse();
+            ReverseEndiannessInternal((byte*)&value, sizeof(T));
+            return value;
         }
     }
 }
