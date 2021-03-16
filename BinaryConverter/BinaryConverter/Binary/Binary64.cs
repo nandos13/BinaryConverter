@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-// TODO: Documentation
 namespace JPAssets.Binary
 {
     /// <summary>
@@ -11,6 +10,9 @@ namespace JPAssets.Binary
     [System.Diagnostics.DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public readonly struct Binary64 : IEquatable<Binary64>
     {
+        /// <summary>
+        /// Denotes the size of this data structure in bytes.
+        /// </summary>
         private const int kByteCount = 8;
 
         [FieldOffset(0)]
@@ -18,7 +20,7 @@ namespace JPAssets.Binary
 
         public unsafe Binary64(byte* ptr)
         {
-            m_data = BinaryUtility.ToData<uint>(*(ptr + 0), *(ptr + 1), *(ptr + 2), *(ptr + 3), *(ptr + 4), *(ptr + 5), *(ptr + 6), *(ptr + 7));
+            m_data = BinaryConversionUtility.ToData<uint>(*(ptr + 0), *(ptr + 1), *(ptr + 2), *(ptr + 3), *(ptr + 4), *(ptr + 5), *(ptr + 6), *(ptr + 7));
         }
 
         public unsafe Binary64(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
@@ -78,39 +80,44 @@ namespace JPAssets.Binary
         {
             unsafe
             {
-                var reversedData = BinaryUtility.ReverseEndianness(m_data);
+                var reversedData = EndiannessUtility.ReverseEndianness(m_data);
                 return new Binary64((byte*)&reversedData);
             }
         }
 
+        /// <inheritdoc cref="BinaryConversionUtility.ExtractBytes{T}(T, out byte, out byte, out byte, out byte, out byte, out byte, out byte, out byte)"/>
         public void ExtractBytes(out byte b0, out byte b1, out byte b2, out byte b3, out byte b4, out byte b5, out byte b6, out byte b7)
         {
-            BinaryUtility.ExtractBytes(m_data, out b0, out b1, out b2, out b3, out b4, out b5, out b6, out b7);
+            BinaryConversionUtility.ExtractBytes(m_data, out b0, out b1, out b2, out b3, out b4, out b5, out b6, out b7);
         }
 
+        /// <returns>A <see cref="long"/> representation of the binary data.</returns>
         public long ToInt64()
         {
             unsafe
             {
                 fixed (ulong* dataPtr = &m_data)
-                    return *(long*)dataPtr;
+                    return BinaryConversionUtility.ToData<long>((byte*)dataPtr);
             }
         }
 
+        /// <returns>A <see cref="ulong"/> representation of the binary data.</returns>
         public ulong ToUInt64()
         {
             return m_data;
         }
 
+        /// <returns>A <see cref="double"/> representation of the binary data.</returns>
         public double ToDouble()
         {
             unsafe
             {
                 fixed (ulong* dataPtr = &m_data)
-                    return *(double*)dataPtr;
+                    return BinaryConversionUtility.ToData<double>((byte*)dataPtr);
             }
         }
 
+        /// <returns>True if the binary data is equal; Otherwise, false.</returns>
         public bool Equals(Binary64 other)
         {
             return m_data.Equals(other.m_data);

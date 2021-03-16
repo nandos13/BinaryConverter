@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-// TODO: Documentation
 namespace JPAssets.Binary
 {
     /// <summary>
@@ -11,6 +10,9 @@ namespace JPAssets.Binary
     [System.Diagnostics.DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public readonly struct Binary32 : IEquatable<Binary32>
     {
+        /// <summary>
+        /// Denotes the size of this data structure in bytes.
+        /// </summary>
         private const int kByteCount = 4;
 
         [FieldOffset(0)]
@@ -18,7 +20,7 @@ namespace JPAssets.Binary
 
         public unsafe Binary32(byte* ptr)
         {
-            m_data = BinaryUtility.ToData<uint>(*(ptr + 0), *(ptr + 1), *(ptr + 2), *(ptr + 3));
+            m_data = BinaryConversionUtility.ToData<uint>(*(ptr + 0), *(ptr + 1), *(ptr + 2), *(ptr + 3));
         }
 
         public unsafe Binary32(byte b0, byte b1, byte b2, byte b3)
@@ -78,39 +80,44 @@ namespace JPAssets.Binary
         {
             unsafe
             {
-                var reversedData = BinaryUtility.ReverseEndianness(m_data);
+                var reversedData = EndiannessUtility.ReverseEndianness(m_data);
                 return new Binary32((byte*)&reversedData);
             }
         }
 
+        /// <inheritdoc cref="BinaryConversionUtility.ExtractBytes{T}(T, out byte, out byte, out byte, out byte)"/>
         public void ExtractBytes(out byte b0, out byte b1, out byte b2, out byte b3)
         {
-            BinaryUtility.ExtractBytes(m_data, out b0, out b1, out b2, out b3);
+            BinaryConversionUtility.ExtractBytes(m_data, out b0, out b1, out b2, out b3);
         }
 
+        /// <returns>A <see cref="int"/> representation of the binary data.</returns>
         public int ToInt32()
         {
             unsafe
             {
                 fixed (uint* dataPtr = &m_data)
-                    return *(int*)dataPtr;
+                    return BinaryConversionUtility.ToData<int>((byte*)dataPtr);
             }
         }
 
+        /// <returns>A <see cref="uint"/> representation of the binary data.</returns>
         public uint ToUInt32()
         {
             return m_data;
         }
 
+        /// <returns>A <see cref="float"/> representation of the binary data.</returns>
         public float ToSingle()
         {
             unsafe
             {
                 fixed (uint* dataPtr = &m_data)
-                    return *(float*)dataPtr;
+                    return BinaryConversionUtility.ToData<float>((byte*)dataPtr);
             }
         }
 
+        /// <returns>True if the binary data is equal; Otherwise, false.</returns>
         public bool Equals(Binary32 other)
         {
             return m_data.Equals(other.m_data);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-// TODO: Documentation
 namespace JPAssets.Binary
 {
     /// <summary>
@@ -11,6 +10,9 @@ namespace JPAssets.Binary
     [System.Diagnostics.DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public readonly struct Binary16 : IEquatable<Binary16>
     {
+        /// <summary>
+        /// Denotes the size of this data structure in bytes.
+        /// </summary>
         private const int kByteCount = 2;
 
         [FieldOffset(0)]
@@ -18,7 +20,7 @@ namespace JPAssets.Binary
 
         public unsafe Binary16(byte* ptr)
         {
-            m_data = BinaryUtility.ToData<ushort>(*(ptr + 0), *(ptr + 1));
+            m_data = BinaryConversionUtility.ToData<ushort>(*(ptr + 0), *(ptr + 1));
         }
 
         public unsafe Binary16(byte b0, byte b1)
@@ -70,39 +72,44 @@ namespace JPAssets.Binary
         {
             unsafe
             {
-                var reversedData = BinaryUtility.ReverseEndianness(m_data);
+                var reversedData = EndiannessUtility.ReverseEndianness(m_data);
                 return new Binary16((byte*)&reversedData);
             }
         }
 
+        /// <inheritdoc cref="BinaryConversionUtility.ExtractBytes{T}(T, out byte, out byte)"/>
         public void ExtractBytes(out byte b0, out byte b1)
         {
-            BinaryUtility.ExtractBytes(m_data, out b0, out b1);
+            BinaryConversionUtility.ExtractBytes(m_data, out b0, out b1);
         }
 
+        /// <returns>A <see cref="char"/> representation of the binary data.</returns>
         public char AsChar()
         {
             unsafe
             {
                 fixed (ushort* dataPtr = &m_data)
-                    return *(char*)dataPtr;
+                    return BinaryConversionUtility.ToData<char>((byte*)dataPtr);
             }
         }
 
+        /// <returns>A <see cref="short"/> representation of the binary data.</returns>
         public short AsInt16()
         {
             unsafe
             {
                 fixed (ushort* dataPtr = &m_data)
-                    return *(short*)dataPtr;
+                    return BinaryConversionUtility.ToData<short>((byte*)dataPtr);
             }
         }
 
+        /// <returns>A <see cref="ushort"/> representation of the binary data.</returns>
         public ushort AsUInt16()
         {
             return m_data;
         }
 
+        /// <returns>True if the binary data is equal; Otherwise, false.</returns>
         public bool Equals(Binary16 other)
         {
             return m_data.Equals(other.m_data);
